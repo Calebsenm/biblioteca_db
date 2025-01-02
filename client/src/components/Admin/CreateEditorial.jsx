@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import "./CreateEditorial.css";
+
 
 function CreateEditorial() {
   const [editorialData, setEditorialData] = useState({
@@ -52,10 +54,10 @@ function CreateEditorial() {
   };
 
   return (
-    <div>
+    <div className="form-container" >
       <h2>Crear Nueva Editorial</h2>
       <form onSubmit={handleSubmit}>
-        <div>
+        <div className="form-group" >
           <label>Nombre:</label>
           <input
             type="text"
@@ -64,7 +66,7 @@ function CreateEditorial() {
             onChange={handleChange}
           />
         </div>
-        <div>
+        <div className="form-group"  >
           <label>Dirección:</label>
           <input
             type="text"
@@ -73,7 +75,7 @@ function CreateEditorial() {
             onChange={handleChange}
           />
         </div>
-        <div>
+        <div className="form-group" >
           <label>Página Web:</label>
           <input
             type="text"
@@ -82,7 +84,10 @@ function CreateEditorial() {
             onChange={handleChange}
           />
         </div>
-        <button type="submit">Crear Editorial</button>
+        
+        <button type="submit" className="my-button"> 
+          Crear Editorial
+        </button>
       </form>
 
       {error && <div style={{ color: 'red' }}>{error}</div>}
