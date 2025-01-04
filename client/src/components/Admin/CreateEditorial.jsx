@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import "./CreateEditorial.css";
 
-
 function CreateEditorial() {
+
   const [editorialData, setEditorialData] = useState({
     nombre: '',
     direccion: '',
