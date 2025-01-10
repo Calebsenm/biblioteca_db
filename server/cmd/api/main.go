@@ -1,67 +1,76 @@
 package main
 
 import (
-    "flag"
-    "database/sql"
-    "log"
-    "net/http"
-    _ "github.com/go-sql-driver/mysql"
+	"database/sql"
+	"flag"
+	_ "github.com/go-sql-driver/mysql"
+	"log"
+	"net/http"
+	"os"
 )
 
 type config struct {
-    port string
-    env  string
-    db   struct {
-        dns string
-    }
+	port string
+	env  string
+	db   struct {
+		dns string
+	}
 }
 
 type application struct {
-    config config
-    db     *sql.DB
+    errorLog *log.Logger
+	infoLog  *log.Logger
+	config   config
+	db       *sql.DB
+
 }
 
 func main() {
-    var con config
+	var con config
 
-    flag.StringVar(&con.port, "addr", "4000", "HTTP network address port for API")
-    flag.StringVar(&con.db.dns, "dns", "root:admin@(127.0.0.1:3306)/biblioteca?parseTime=true", "MySQL data source name")
+	flag.StringVar(&con.port, "addr", "4000", "HTTP network address port for API")
+	flag.StringVar(&con.db.dns, "dns", "root:admin@(127.0.0.1:3306)/biblioteca?parseTime=true", "MySQL data source name")
 
-    flag.Parse()
+	flag.Parse()
 
-    db, err := openDB(con)
-    if err != nil {
-        log.Fatal(err)
-    }
-    defer db.Close()
-    log.Println("Database connection pool established")
+	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime );
+    errorLog := log.New(os.Stderr , "ERROR\t", log.Ldate | log.Ltime | log.Lshortfile );
 
-    app := &application{
-        config: con,
-        db:     db,
-    }
 
-    svr := &http.Server{
-        Addr:    ":" + app.config.port,
-        Handler: app.routes(),
-    }
+	db, err := openDB(con)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+	log.Println("Database connection pool established")
 
-    err = svr.ListenAndServe()
-    if err != nil {
-        log.Panic(err)
-    }
+	app := &application{
+		errorLog: errorLog,
+		infoLog:infoLog,
+		config: con,
+		db:     db,
+	}
+
+	svr := &http.Server{
+		Addr:    ":" + app.config.port,
+		Handler: app.routes(),
+	}
+
+	err = svr.ListenAndServe()
+	if err != nil {
+		log.Panic(err)
+	}
 }
 
 func openDB(con config) (*sql.DB, error) {
-    db, err := sql.Open("mysql", con.db.dns)
-    if err != nil {
-        return nil, err
-    }
+	db, err := sql.Open("mysql", con.db.dns)
+	if err != nil {
+		return nil, err
+	}
 
-    if err = db.Ping(); err != nil {
-        return nil, err
-    }
+	if err = db.Ping(); err != nil {
+		return nil, err
+	}
 
-    return db, nil
+	return db, nil
 }
-
