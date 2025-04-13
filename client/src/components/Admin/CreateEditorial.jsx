@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import "./CreateEditorial.css";
+import "../../styles/components/CreateEditorial.css"
 
 function CreateEditorial() {
 
@@ -41,7 +41,7 @@ function CreateEditorial() {
       });
 
       // Mostrar mensaje de éxito
-      setSuccess('Editorial creada exitosamente');
+      setSuccess('Editorial guardada exitosamente');
       setEditorialData({ nombre: '', direccion: '', paginaWeb: '' });
     } catch (error) {
       // Manejo de errores
@@ -54,8 +54,8 @@ function CreateEditorial() {
   };
 
   return (
-    <div className="form-container" >
-      <h2>Crear Nueva Editorial</h2>
+    <div className='form_container'>
+      <h2>Guardar Nueva Editorial</h2>
       <form onSubmit={handleSubmit}>
         <div className="form-group" >
           <label>Nombre:</label>

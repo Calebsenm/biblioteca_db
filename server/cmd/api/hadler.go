@@ -17,7 +17,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		Version   string            `json:"version"`
 		Endpoints map[string]string `json:"endpoints"`
 	}
-
+    
 	response := RootResponse{
 		Message: "Welcome to My API!",
 		Version: "1.0.0",
@@ -232,7 +232,7 @@ func (app *application) getActiveLoansHandler(w http.ResponseWriter, r *http.Req
 		var loan Loans
 
 		err := rows.Scan(&loan.IDPrestamo, &loan.IDSocio, &loan.IDLibro, &loan.FechaPrestamo, &loan.FechaDevolucion, &loan.Estado)
-		if err != nil {
+			if err != nil {
 			http.Error(w, "error al leer resultados de la base de datos", http.StatusInternalServerError)
 			return
 		}

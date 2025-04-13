@@ -22,7 +22,6 @@ type application struct {
 	infoLog  *log.Logger
 	config   config
 	db       *sql.DB
-
 }
 
 func main() {
