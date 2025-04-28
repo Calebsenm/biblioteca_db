@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import AdminRoutes from "./routes/AdminRoutes";
 import UserRoutes from "./routes/UserRoutes";
 import NotFound from "./pages/NotFound";
+import Register from "./pages/Register";
 import "./styles/App.css";
 
 const App = () => {
@@ -11,6 +12,7 @@ const App = () => {
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/admin/*" element={<AdminRoutes />} />
         <Route path="/user/*" element={<UserRoutes />} />

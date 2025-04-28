@@ -7,7 +7,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import Loans from "../components/Admin/Loans";
 import Fines from "../components/Admin/Fines";
 import Reservation from "../components/Admin/Reservation";
-import Register from "../components/Admin/Register";
+import Register from "../pages/Register";
 import CreateBook from "../components/Admin/CreateBook";
 import CreateEditorial from "../components/Admin/CreateEditorial";
 

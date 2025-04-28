@@ -42,7 +42,7 @@ const Login = () => {
         navigate("/user/dashboard");
       }
     } catch (error) {
-      console.error("Error during login:", error );
+      console.error("Error during login:", error);
       setErrorMessage("An error occurred. Please try again.");
     }
   };
@@ -70,12 +70,18 @@ const Login = () => {
               required
             />
           </div>
-          <div className="forgot-password">
-            <a href="#">Forgot password?</a>
-          </div>
+
           <button type="submit" className="login-btn">
             Log in
           </button>
+          <div className="text">
+            <div className="create-acount">
+              <a href="register">Create Acount</a>
+            </div>
+            <div className="forgot-password">
+              <a href="#">Forgot password?</a>
+            </div>
+          </div>
         </form>
       </div>
     </div>
