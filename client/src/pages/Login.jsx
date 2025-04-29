@@ -1,6 +1,5 @@
-// src/pages/Login.jsx
 import React, { useState } from "react";
-import "../styles/login.css"; // Importamos los estilos
+import "../styles/login.css";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -14,7 +13,7 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      // Hacer la solicitud al backend
+
       const response = await fetch("http://localhost:4000/api/login", {
         method: "POST",
         headers: {
@@ -24,17 +23,15 @@ const Login = () => {
       });
 
       if (!response.ok) {
-        // Si la respuesta no es OK, mostrar un error
+
         const errorData = await response.json();
         setErrorMessage(errorData.message || "Login failed.");
         return;
       }
 
       const data = await response.json();
-
-      // para guardar en local store 
       localStorage.setItem("user", JSON.stringify(data));
-      console.log("Usuario autenticado:", data);
+
 
       if (data.rol === "administrador") {
         navigate("/admin/dashboard");
@@ -50,7 +47,7 @@ const Login = () => {
   return (
     <div className="login-container">
       <div className="login-box">
-        <h2 className="login-header">Biblioteca</h2> {/* Título ajustado */}
+        <h2 className="login-header">Biblioteca</h2> 
         <form onSubmit={handleSubmit}>
           <div className="input-group">
             <input
