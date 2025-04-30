@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import "../../styles/components/CreateEditorial.css"
+import "../../styles/CreateEditorial.css"
 
 function CreateEditorial() {
 

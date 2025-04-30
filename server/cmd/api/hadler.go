@@ -17,7 +17,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		Version   string            `json:"version"`
 		Endpoints map[string]string `json:"endpoints"`
 	}
-    
+
 	response := RootResponse{
 		Message: "Welcome to My API!",
 		Version: "1.0.0",
@@ -232,7 +232,7 @@ func (app *application) getActiveLoansHandler(w http.ResponseWriter, r *http.Req
 		var loan Loans
 
 		err := rows.Scan(&loan.IDPrestamo, &loan.IDSocio, &loan.IDLibro, &loan.FechaPrestamo, &loan.FechaDevolucion, &loan.Estado)
-			if err != nil {
+		if err != nil {
 			http.Error(w, "error al leer resultados de la base de datos", http.StatusInternalServerError)
 			return
 		}
@@ -337,33 +337,32 @@ func (app *application) getUserFinesHandler(w http.ResponseWriter, r *http.Reque
 	}
 }
 
-
 func (app *application) getActiveReservationsHandler(w http.ResponseWriter, r *http.Request) {
-    type Reservation struct {
-        IdReserva      int    `json:"idreserva"`
-        IdSocio        int    `json:"idsocio"`
-        NombreSocio    string `json:"nombre_socio"`
-        IdLibro        int    `json:"idlibro"`
-        TituloLibro    string `json:"titulo_libro"`
-        FechaReserva   string `json:"fechareserva"`
-        EstadoReserva  string `json:"estado_reserva"`
-        GeneroLibro    string `json:"genero_libro"`
-        Editorial      string `json:"editorial"`
-        TelefonoSocio  string `json:"telefono_socio"`
-        CorreoSocio    string `json:"correo_socio"`
-        TipoSocio      string `json:"tiposocio"`
-        FechaNacimiento string `json:"fechanacimiento"`
-        FechaRegistro  string `json:"fecharegistro"`
-    }
+	type Reservation struct {
+		IdReserva       int    `json:"idreserva"`
+		IdSocio         int    `json:"idsocio"`
+		NombreSocio     string `json:"nombre_socio"`
+		IdLibro         int    `json:"idlibro"`
+		TituloLibro     string `json:"titulo_libro"`
+		FechaReserva    string `json:"fechareserva"`
+		EstadoReserva   string `json:"estado_reserva"`
+		GeneroLibro     string `json:"genero_libro"`
+		Editorial       string `json:"editorial"`
+		TelefonoSocio   string `json:"telefono_socio"`
+		CorreoSocio     string `json:"correo_socio"`
+		TipoSocio       string `json:"tiposocio"`
+		FechaNacimiento string `json:"fechanacimiento"`
+		FechaRegistro   string `json:"fecharegistro"`
+	}
 
-    // Obtener parámetros de búsqueda
-    usuario := r.URL.Query().Get("usuarioid")
-    libro := r.URL.Query().Get("libro")
-    fecha := r.URL.Query().Get("fecha")
-    nombreSocio := r.URL.Query().Get("nombre")
+	// Obtener parámetros de búsqueda
+	usuario := r.URL.Query().Get("usuarioid")
+	libro := r.URL.Query().Get("libro")
+	fecha := r.URL.Query().Get("fecha")
+	nombreSocio := r.URL.Query().Get("nombre")
 
-    // Crear la consulta SQL base
-    query := `
+	// Crear la consulta SQL base
+	query := `
         SELECT 
             r.idreserva,
             r.idsocio,
@@ -391,67 +390,63 @@ func (app *application) getActiveReservationsHandler(w http.ResponseWriter, r *h
             r.estado = 'activa'
     `
 
-    // Lista para los parámetros
-    var params []interface{}
+	// Lista para los parámetros
+	var params []interface{}
 
-    // Agregar filtros condicionalmente
-    if usuario != "" {
-        query += " AND r.idsocio = ?"
-        params = append(params, usuario)
-    }
-    if libro != "" {
-        query += " AND r.idlibro = ?"
-        params = append(params, libro)
-    }
-    if fecha != "" {
-        query += " AND r.fechareserva = ?"
-        params = append(params, fecha)
-    }
-    if nombreSocio != "" {
-        query += " AND s.nombre LIKE ?"
-        params = append(params, "%"+nombreSocio+"%")
-    }
+	// Agregar filtros condicionalmente
+	if usuario != "" {
+		query += " AND r.idsocio = ?"
+		params = append(params, usuario)
+	}
+	if libro != "" {
+		query += " AND r.idlibro = ?"
+		params = append(params, libro)
+	}
+	if fecha != "" {
+		query += " AND r.fechareserva = ?"
+		params = append(params, fecha)
+	}
+	if nombreSocio != "" {
+		query += " AND s.nombre LIKE ?"
+		params = append(params, "%"+nombreSocio+"%")
+	}
 
-    // Ordenar por fecha de reserva de manera descendente
-    query += " ORDER BY r.fechareserva DESC"
+	// Ordenar por fecha de reserva de manera descendente
+	query += " ORDER BY r.fechareserva DESC"
 
-    // Ejecutar la consulta con los parámetros
-    rows, err := app.db.Query(query, params...)
-    if err != nil {
-        http.Error(w, "Error ejecutando consulta", http.StatusInternalServerError)
-        return
-    }
-    defer rows.Close()
+	// Ejecutar la consulta con los parámetros
+	rows, err := app.db.Query(query, params...)
+	if err != nil {
+		http.Error(w, "Error ejecutando consulta", http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
 
-    // Leer los resultados
-    var reservations []Reservation
-    for rows.Next() {
-        var reservation Reservation
-        if err := rows.Scan(&reservation.IdReserva, &reservation.IdSocio, &reservation.NombreSocio,
-            &reservation.IdLibro, &reservation.TituloLibro, &reservation.FechaReserva, &reservation.EstadoReserva,
-            &reservation.GeneroLibro, &reservation.Editorial, &reservation.TelefonoSocio, &reservation.CorreoSocio,
-            &reservation.TipoSocio, &reservation.FechaNacimiento, &reservation.FechaRegistro); err != nil {
-            http.Error(w, "Error al leer los resultados", http.StatusInternalServerError)
-            return
-        }
-        reservations = append(reservations, reservation)
-    }
+	// Leer los resultados
+	var reservations []Reservation
+	for rows.Next() {
+		var reservation Reservation
+		if err := rows.Scan(&reservation.IdReserva, &reservation.IdSocio, &reservation.NombreSocio,
+			&reservation.IdLibro, &reservation.TituloLibro, &reservation.FechaReserva, &reservation.EstadoReserva,
+			&reservation.GeneroLibro, &reservation.Editorial, &reservation.TelefonoSocio, &reservation.CorreoSocio,
+			&reservation.TipoSocio, &reservation.FechaNacimiento, &reservation.FechaRegistro); err != nil {
+			http.Error(w, "Error al leer los resultados", http.StatusInternalServerError)
+			return
+		}
+		reservations = append(reservations, reservation)
+	}
 
-    if err := rows.Err(); err != nil {
-        http.Error(w, "Error durante la iteración de filas", http.StatusInternalServerError)
-        return
-    }
+	if err := rows.Err(); err != nil {
+		http.Error(w, "Error durante la iteración de filas", http.StatusInternalServerError)
+		return
+	}
 
-    // Establecer el encabezado de la respuesta como JSON
-    w.Header().Set("Content-Type", "application/json")
-    if err := json.NewEncoder(w).Encode(reservations); err != nil {
-        http.Error(w, "Error al codificar la respuesta", http.StatusInternalServerError)
-    }
+	// Establecer el encabezado de la respuesta como JSON
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(reservations); err != nil {
+		http.Error(w, "Error al codificar la respuesta", http.StatusInternalServerError)
+	}
 }
-
-
-
-
 
 func (app *application) getUserLoanHistoryHandler(w http.ResponseWriter, r *http.Request) {
 	idUsuario := r.URL.Query().Get("idsocio")
@@ -693,23 +688,19 @@ func (app *application) getBooksByPublicationDateHandler(w http.ResponseWriter, 
 
 }
 
-
-
-
-
 func (app *application) getBooksAvailableByGenreAndAuthorHandler(w http.ResponseWriter, r *http.Request) {
-    if r.Method != http.MethodGet {
-        http.Error(w, "Método no permitido", http.StatusMethodNotAllowed)
-        return
-    }
+	if r.Method != http.MethodGet {
+		http.Error(w, "Método no permitido", http.StatusMethodNotAllowed)
+		return
+	}
 
-    // Obtener los parámetros de la URL
-    genero := r.URL.Query().Get("genero")
-    autor := r.URL.Query().Get("autor")
-    titulo := r.URL.Query().Get("titulo")
+	// Obtener los parámetros de la URL
+	genero := r.URL.Query().Get("genero")
+	autor := r.URL.Query().Get("autor")
+	titulo := r.URL.Query().Get("titulo")
 
-    // Definir la consulta SQL base
-    query := `
+	// Definir la consulta SQL base
+	query := `
         SELECT 
             libro.idlibro,
             libro.titulo,
@@ -726,77 +717,73 @@ func (app *application) getBooksAvailableByGenreAndAuthorHandler(w http.Response
             libro.estado = 'disponible' 
     `
 
-    // Lista de parámetros que vamos a usar para la consulta
-    var params []interface{}
+	// Lista de parámetros que vamos a usar para la consulta
+	var params []interface{}
 
-    // Agregar condiciones de filtrado a la consulta según los parámetros proporcionados
-    if genero != "" {
-        query += " AND libro.genero LIKE ?"
-        params = append(params, "%"+genero+"%")
-    }
-    if autor != "" {
-        query += " AND autor.nombre LIKE ?"
-        params = append(params, "%"+autor+"%")
-    }
-    if titulo != "" {
-        query += " AND libro.titulo LIKE ?"
-        params = append(params, "%"+titulo+"%")
-    }
+	// Agregar condiciones de filtrado a la consulta según los parámetros proporcionados
+	if genero != "" {
+		query += " AND libro.genero LIKE ?"
+		params = append(params, "%"+genero+"%")
+	}
+	if autor != "" {
+		query += " AND autor.nombre LIKE ?"
+		params = append(params, "%"+autor+"%")
+	}
+	if titulo != "" {
+		query += " AND libro.titulo LIKE ?"
+		params = append(params, "%"+titulo+"%")
+	}
 
-    // Ejecutar la consulta con los parámetros dinámicos
-    rows, err := app.db.Query(query, params...)
-    if err != nil {
-        http.Error(w, "Error ejecutando consulta", http.StatusInternalServerError)
-        return
-    }
-    defer rows.Close()
+	// Ejecutar la consulta con los parámetros dinámicos
+	rows, err := app.db.Query(query, params...)
+	if err != nil {
+		http.Error(w, "Error ejecutando consulta", http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
 
-    // Definir la estructura para los libros
-    type Book struct {
-        IDLibro int    `json:"id_libro"`
-        Titulo  string `json:"titulo"`
-        Genero  string `json:"genero"`
-        Estado  string `json:"estado"`
-        Autor   string `json:"autor"`
-    }
+	// Definir la estructura para los libros
+	type Book struct {
+		IDLibro int    `json:"id_libro"`
+		Titulo  string `json:"titulo"`
+		Genero  string `json:"genero"`
+		Estado  string `json:"estado"`
+		Autor   string `json:"autor"`
+	}
 
-    var books []Book
+	var books []Book
 
-    // Procesar resultados
-    for rows.Next() {
-        var book Book
-        err := rows.Scan(&book.IDLibro, &book.Titulo, &book.Genero, &book.Estado, &book.Autor)
-        if err != nil {
-            http.Error(w, "Error al leer los resultados", http.StatusInternalServerError)
-            return
-        }
-        books = append(books, book)
-    }
+	// Procesar resultados
+	for rows.Next() {
+		var book Book
+		err := rows.Scan(&book.IDLibro, &book.Titulo, &book.Genero, &book.Estado, &book.Autor)
+		if err != nil {
+			http.Error(w, "Error al leer los resultados", http.StatusInternalServerError)
+			return
+		}
+		books = append(books, book)
+	}
 
-    if err := rows.Err(); err != nil {
-        http.Error(w, "Error durante la iteración de filas", http.StatusInternalServerError)
-        return
-    }
+	if err := rows.Err(); err != nil {
+		http.Error(w, "Error durante la iteración de filas", http.StatusInternalServerError)
+		return
+	}
 
-    // Si no hay resultados, enviar mensaje claro
-    if len(books) == 0 {
-        w.Header().Set("Content-Type", "application/json")
-        w.WriteHeader(http.StatusNotFound)
-        json.NewEncoder(w).Encode(map[string]string{"message": "No hay libros disponibles para el criterio especificado"})
-        return
-    }
+	// Si no hay resultados, enviar mensaje claro
+	if len(books) == 0 {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"message": "No hay libros disponibles para el criterio especificado"})
+		return
+	}
 
-    // Responder con los resultados en formato JSON
-    w.Header().Set("Content-Type", "application/json")
-    err = json.NewEncoder(w).Encode(books)
-    if err != nil {
-        http.Error(w, "Error al codificar la respuesta", http.StatusInternalServerError)
-    }
+	// Responder con los resultados en formato JSON
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(books)
+	if err != nil {
+		http.Error(w, "Error al codificar la respuesta", http.StatusInternalServerError)
+	}
 }
-
-
-
-
 
 func (app *application) getUserActiveLoanStatusHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -881,7 +868,6 @@ func (app *application) getUserActiveLoanStatusHandler(w http.ResponseWriter, r 
 
 }
 
-
 func (app *application) createLoanHandler(w http.ResponseWriter, r *http.Request) {
 	// Validar que el método sea POST
 	if r.Method != http.MethodPost {
@@ -891,9 +877,9 @@ func (app *application) createLoanHandler(w http.ResponseWriter, r *http.Request
 
 	// Decodificar el cuerpo de la solicitud JSON
 	var requestBody struct {
-		UsuarioID     int    `json:"usuario_id"`
-		LibroID       int    `json:"libro_id"`
-		FechaPrestamo string `json:"fecha_prestamo"`
+		UsuarioID       int    `json:"usuario_id"`
+		LibroID         int    `json:"libro_id"`
+		FechaPrestamo   string `json:"fecha_prestamo"`
 		FechaDevolucion string `json:"fecha_devolucion"`
 	}
 	err := json.NewDecoder(r.Body).Decode(&requestBody)
@@ -914,10 +900,10 @@ func (app *application) createLoanHandler(w http.ResponseWriter, r *http.Request
 	// Llamar al procedimiento almacenado para realizar el préstamo, pasando la nueva ID generada
 	_, err = app.db.Exec(
 		"CALL realizarPrestamo(?, ?, ?, ?, ?)",
-		newLoanID,               // Nueva ID del préstamo
-		requestBody.UsuarioID,   // ID del usuario
-		requestBody.LibroID,     // ID del libro
-		requestBody.FechaPrestamo, 
+		newLoanID,             // Nueva ID del préstamo
+		requestBody.UsuarioID, // ID del usuario
+		requestBody.LibroID,   // ID del libro
+		requestBody.FechaPrestamo,
 		requestBody.FechaDevolucion,
 	)
 
@@ -931,7 +917,6 @@ func (app *application) createLoanHandler(w http.ResponseWriter, r *http.Request
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Préstamo realizado con éxito"})
 }
-
 
 func (app *application) getUserCompletedLoanHistoryHandler(w http.ResponseWriter, r *http.Request) {
 	// Validar que el método sea GET
@@ -1350,7 +1335,6 @@ func (app *application) registerHandler(w http.ResponseWriter, r *http.Request) 
 	})
 }
 
-
 func (app *application) createBookHandler(w http.ResponseWriter, r *http.Request) {
 	var newBook struct {
 		IdLibro          int    `json:"idlibro"`
@@ -1589,13 +1573,12 @@ func (app *application) extendLoanHandler(w http.ResponseWriter, r *http.Request
 	w.Write([]byte("Préstamo extendido exitosamente"))
 }
 
-
 // Crear una nueva editorial
 func (app *application) createEditorialHandler(w http.ResponseWriter, r *http.Request) {
 	var newEditorial struct {
-		Nombre      string `json:"nombre"`
-		Direccion   string `json:"direccion"`
-		PaginaWeb   string `json:"paginaweb"`
+		Nombre    string `json:"nombre"`
+		Direccion string `json:"direccion"`
+		PaginaWeb string `json:"paginaweb"`
 	}
 
 	// Decodificar el cuerpo de la solicitud JSON
@@ -1606,7 +1589,6 @@ func (app *application) createEditorialHandler(w http.ResponseWriter, r *http.Re
 	}
 
 	newid := generateNewId(app, "editorial", "ideditorial")
-
 
 	// Insertar la nueva editorial en la base de datos
 	insertEditorialQuery := `
@@ -1659,6 +1641,34 @@ func (app *application) getEditorialsHandler(w http.ResponseWriter, r *http.Requ
 	json.NewEncoder(w).Encode(editorials)
 }
 
+func (app *application) createAutorHander(w http.ResponseWriter, r *http.Request) {
+	var newAutor struct {
+		Name        string `json:"name"`
+		Nationality string `json:"nationality"`
+	}
+
+	err := json.NewDecoder(r.Body).Decode(&newAutor)
+	if err != nil {
+		http.Error(w, "Error al procesar la solicitud", http.StatusBadRequest)
+		return
+	}
+
+	newId := generateNewId(app, "autor", "idautor")
+
+	SQlquery := `INSERT INTO autor(idautor,nombre, nacionalidad )
+			VALUES(?,?,?)`
+	_, err = app.db.Exec(SQlquery, newId, newAutor.Name, newAutor.Nationality)
+
+	if err != nil {
+		http.Error(w, "Error al insertar el autor", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte("Autor creado exitosamente"))
+
+}
+
 // Obtener todos los autores
 func (app *application) getAutoresHandler(w http.ResponseWriter, r *http.Request) {
 	// Ejecuta la consulta para obtener todos los autores
@@ -1671,16 +1681,16 @@ func (app *application) getAutoresHandler(w http.ResponseWriter, r *http.Request
 
 	// Estructura para almacenar los autores
 	var authors []struct {
-		ID          int    `json:"idautor"`
-		Nombre      string `json:"nombre"`
+		ID           int    `json:"idautor"`
+		Nombre       string `json:"nombre"`
 		Nacionalidad string `json:"nacionalidad"`
 	}
 
 	// Itera sobre los resultados de la consulta
 	for rows.Next() {
 		var author struct {
-			ID          int    `json:"idautor"`
-			Nombre      string `json:"nombre"`
+			ID           int    `json:"idautor"`
+			Nombre       string `json:"nombre"`
 			Nacionalidad string `json:"nacionalidad"`
 		}
 		if err := rows.Scan(&author.ID, &author.Nombre, &author.Nacionalidad); err != nil {
@@ -1695,8 +1705,6 @@ func (app *application) getAutoresHandler(w http.ResponseWriter, r *http.Request
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(authors)
 }
-
-
 
 func generateNewId(app *application, tableName string, idColumn string) int {
 	var maxId int

@@ -10,6 +10,7 @@ import Reservation from "../components/Admin/Reservation";
 import Register from "../pages/Register";
 import CreateBook from "../components/Admin/CreateBook";
 import CreateEditorial from "../components/Admin/CreateEditorial";
+import CreateAuthor  from "../components/Admin/Author";
 
 
 const AdminRoutes = () => {
@@ -22,9 +23,9 @@ const AdminRoutes = () => {
           <Route path="/loans" element={<Loans/>} />
           <Route path="/fines" element={<Fines/>} />
           <Route path="/reservations" element={<Reservation/>} />
-          <Route path="/register" element={ <Register/> }/>
           <Route path="/registrarlibro" element={ <CreateBook/> }/>
           <Route path="/registaredi" element = {<CreateEditorial/>} />
+          <Route path="/registrar-autor" element ={<CreateAuthor/>} />
         </Routes>
       </AdminLayout>
       </ProtectedRoute >

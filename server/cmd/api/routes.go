@@ -9,6 +9,7 @@ import (
 func (app *application) routes() http.Handler {
 	mux := http.NewServeMux()
 
+	// Rutas de admistrador 
 	mux.HandleFunc("/", app.home)
 	mux.HandleFunc("GET /api/admin/books", app.getFilteredBooksHandler)
 	mux.HandleFunc("GET /api/admin/books/unavailable", app.getUnavailableBooksHandler)
@@ -27,8 +28,9 @@ func (app *application) routes() http.Handler {
 	mux.HandleFunc("GET /api/loans", app.getUserActiveLoanStatusHandler)
 	mux.HandleFunc("GET /api/loans/completed", app.getUserCompletedLoanHistoryHandler)
 	mux.HandleFunc("GET /api/fines", app.getUserPendingFinesHandler)
-	mux.HandleFunc("GET /api/reservations", app.getUserActiveReservationsHandler) // GET
+	mux.HandleFunc("GET /api/reservations", app.getUserActiveReservationsHandler)
 
+	// Register 
 	mux.HandleFunc("POST /api/login", app.loginHandler)
 	mux.HandleFunc("POST /api/register", app.registerHandler)
 
@@ -37,6 +39,9 @@ func (app *application) routes() http.Handler {
 	mux.HandleFunc("PUT /api/admin/books/{id}", app.updateBookHandler)
 	mux.HandleFunc("POST /api/editoriales", app.createEditorialHandler)
 	mux.HandleFunc("GET /api/editoriales", app.getEditorialsHandler)
+
+	// Get the Authors
+	mux.HandleFunc("POST /api/admin/autores" , app.createAutorHander)
 	mux.HandleFunc("GET /api/autores", app.getAutoresHandler)
 
 	// Rutas de Gestión de Reservas
@@ -47,7 +52,7 @@ func (app *application) routes() http.Handler {
 	mux.HandleFunc("POST /api/loans/extend/{id}", app.extendLoanHandler) // POST - Extender préstamo
 
 	c := cors.New(cors.Options{
-		//AllowedOrigins:   []string{"http://127.0.0.1:3000"}, // Dominios permitidos
+		//AllowedOrigins:   []string{"http://127.0.0.1:3000"}, 
 		AllowedOrigins:   []string{"http://localhost:3000"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Content-Type", "Authorization"},
