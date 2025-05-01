@@ -1342,27 +1342,25 @@ func (app *application) createBookHandler(w http.ResponseWriter, r *http.Request
 		Genero           string `json:"genero"`
 		FechaPublicacion string `json:"fechapublicacion"`
 		EditorialID      int    `json:"ideditorial"`
-		Autores          []int  `json:"autores"` // Lista de IDs de autores
+		Autores          []int  `json:"autores"`
 	}
 
-	// Decodificar el cuerpo del request JSON
 	err := json.NewDecoder(r.Body).Decode(&newBook)
 	if err != nil {
 		http.Error(w, "Error al procesar la solicitud", http.StatusBadRequest)
 		return
 	}
 
-	// Genera un nuevo ID único para el libro
 	newBook.IdLibro = generateNewId(app, "libro", "idlibro")
 
-	// Inserción del nuevo libro
 	insertBookQuery := `
-        INSERT INTO libro (idlibro, titulo, genero, fechapublicacion, estado, ideditorial)
-        VALUES (?, ?, ?, ?, 'disponible', ?)`
+        INSERT INTO libro (idlibro, ideditorial, fechapublicacion,titulo, genero, estado)
+        VALUES (?, ?, ?, ?, ?,'disponible')`
 
-	_, err = app.db.Exec(insertBookQuery, newBook.IdLibro, newBook.Titulo, newBook.Genero, newBook.FechaPublicacion, newBook.EditorialID)
+	_, err = app.db.Exec(insertBookQuery, newBook.IdLibro,newBook.EditorialID, newBook.FechaPublicacion, newBook.Titulo, newBook.Genero)
 	if err != nil {
 		http.Error(w, "Error al insertar el libro", http.StatusInternalServerError)
+		fmt.Println(err, newBook)
 		return
 	}
 

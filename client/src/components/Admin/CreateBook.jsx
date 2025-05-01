@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './CreateBook.css';
 
 function CreateBook() {
   const [formData, setFormData] = useState({
     titulo: '',
     genero: '',
-    fechaPublicacion: '',
-    editorialID: '',
-    autores: [], // Lista de IDs de autores
+    fechapublicacion: '',
+    ideditorial: '',
+    autores: [],
   });
 
   const [editorials, setEditorials] = useState([]);
@@ -15,199 +16,162 @@ function CreateBook() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // Fetch editoriales y autores
   useEffect(() => {
-    // Obtener editoriales
     axios.get('http://localhost:4000/api/editoriales')
-      .then(response => setEditorials(response.data)) // Asegúrate que la respuesta sea un array de editoriales
-      .catch(error => setError('Error al cargar editoriales'));
+      .then(response => {
+        const editorialesData = response.data.map(editorial => ({
+          ...editorial,
+          ideditorial: Number(editorial.ideditorial)
+        }));
+        setEditorials(editorialesData);
+      })
+      .catch(() => setError('Error al cargar editoriales'));
 
-    // Obtener autores
     axios.get('http://localhost:4000/api/autores')
-      .then(response => setAuthors(response.data)) // Asegúrate que la respuesta sea un array de autores
-      .catch(error => setError('Error al cargar autores'));
+      .then(response => {
+        const autoresData = response.data.map(author => ({
+          ...author,
+          id: Number(author.id)
+        }));
+        setAuthors(autoresData);
+      })
+      .catch(() => setError('Error al cargar autores'));
   }, []);
 
-  // Maneja los cambios de los campos del formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
+    setFormData(prev => ({
+      ...prev,
+      [name]: name === 'ideditorial' ? Number(value) : value,
     }));
   };
 
-  // Maneja la selección de autores
   const handleSelectAutores = (e) => {
-    const { options } = e.target;
-    const selectedAutores = Array.from(options).filter(option => option.selected).map(option => option.value);
-    setFormData((prevData) => ({
-      ...prevData,
-      autores: selectedAutores,
+    const value = e.target.value;
+    setFormData(prev => ({
+      ...prev,
+      autores: value ? [Number(value)] : []
     }));
   };
 
-  // Maneja el envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
-    // Validación de campos
-    if (
-      !formData.titulo ||
-      !formData.genero ||
-      !formData.fechaPublicacion ||
-      !formData.editorialID ||
-      formData.autores.length === 0
-    ) {
+    // Validación mejorada
+    if (!formData.titulo || !formData.genero || !formData.fechapublicacion || 
+        !formData.ideditorial || formData.autores.length === 0) {
       setError('Todos los campos son obligatorios');
       return;
     }
 
     try {
-      // Realizar solicitud POST al backend
-      const response = await axios.post('http://localhost:4000/api/libros', formData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      const requestData = {
+        titulo: formData.titulo,
+        genero: formData.genero,
+        fechapublicacion: formData.fechapublicacion,
+        ideditorial: Number(formData.ideditorial),
+        autores: formData.autores.map(Number)
+      };
+
+      console.log('Datos a enviar:', requestData); // Para depuración
+
+      await axios.post('http://localhost:4000/api/admin/books', requestData, {
+        headers: { 'Content-Type': 'application/json' }
       });
 
-      // Respuesta exitosa
       setSuccess('Libro creado exitosamente');
+      // Resetear formulario
+      setFormData({
+        titulo: '',
+        genero: '',
+        fechapublicacion: '',
+        ideditorial: '',
+        autores: [],
+      });
     } catch (error) {
-      // Manejo de errores
-      if (error.response) {
-        setError(error.response.data.message || 'Error al crear el libro');
-      } else {
-        setError('Error en la conexión con el servidor');
-      }
+      console.error('Error al crear libro:', error);
+      setError(error.response?.data?.message || 'Error al crear el libro');
     }
   };
 
-  const formStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    maxWidth: '400px',
-    margin: '0 auto',
-    padding: '20px',
-    borderRadius: '8px',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-  };
-
-  const inputStyle = {
-    padding: '8px',
-    margin: '10px 0',
-    border: '1px solid #ddd',
-    borderRadius: '4px',
-  };
-
-  const selectStyle = {
-    padding: '8px',
-    margin: '10px 0',
-    border: '1px solid #ddd',
-    borderRadius: '4px',
-  };
-
-  const buttonStyle = {
-    padding: '10px 20px',
-    backgroundColor: '#007BFF',
-    color: 'white',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    marginTop: '10px',
-  };
-
-  const errorStyle = {
-    color: 'red',
-    marginTop: '10px',
-  };
-
-  const successStyle = {
-    color: 'green',
-    marginTop: '10px',
-  };
-
   return (
-    <div>
+    <div className="form-container">
       <h2>Crear Nuevo Libro</h2>
-      <form onSubmit={handleSubmit} style={formStyle}>
-        <div>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
           <label>Título:</label>
           <input
             type="text"
             name="titulo"
             value={formData.titulo}
             onChange={handleChange}
-            style={inputStyle}
+            required
           />
         </div>
-        <div>
+
+        <div className="form-group">
           <label>Género:</label>
           <input
             type="text"
             name="genero"
             value={formData.genero}
             onChange={handleChange}
-            style={inputStyle}
+            required
           />
         </div>
-        <div>
+
+        <div className="form-group">
           <label>Fecha de Publicación:</label>
           <input
             type="date"
-            name="fechaPublicacion"
-            value={formData.fechaPublicacion}
+            name="fechapublicacion"
+            value={formData.fechapublicacion}
             onChange={handleChange}
-            style={inputStyle}
+            required
           />
         </div>
-        <div>
+
+        <div className="form-group">
           <label>Editorial:</label>
           <select
-            name="editorialID"
-            value={formData.editorialID}
+            name="ideditorial"
+            value={formData.ideditorial}
             onChange={handleChange}
-            style={selectStyle}
+            required
           >
             <option value="">Seleccione una editorial</option>
-            {editorials && editorials.length > 0 ? (
-              editorials.map(editorial => (
-                <option key={editorial.id} value={editorial.id}>
-                  {editorial.nombre}
-                </option>
-              ))
-            ) : (
-              <option value="">No hay editoriales disponibles</option>
-            )}
+            {editorials.map(editorial => (
+              <option key={editorial.ideditorial} value={editorial.ideditorial}>
+                {editorial.nombre}
+              </option>
+            ))}
           </select>
         </div>
-        <div>
-          <label>Autores:</label>
+
+        <div className="form-group">
+          <label>Autor:</label>
           <select
             name="autores"
-            multiple
-            value={formData.autores}
+            value={formData.autores[0]}
             onChange={handleSelectAutores}
-            style={selectStyle}
+            required
           >
-            {authors && authors.length > 0 ? (
-              authors.map(author => (
-                <option key={author.id} value={author.id}>
-                  {author.nombre}
-                </option>
-              ))
-            ) : (
-              <option value="">No hay autores disponibles</option>
-            )}
+            <option value="">Seleccione un autor</option>
+            {authors.map(author => (
+              <option key={author.id} value={author.id}>
+                {author.nombre}
+              </option>
+            ))}
           </select>
         </div>
-        <button type="submit" style={buttonStyle}>Crear Libro</button>
+
+        <button type="submit" className="submit-btn">Crear Libro</button>
       </form>
 
-      {error && <div style={errorStyle}>{error}</div>}
-      {success && <div style={successStyle}>{success}</div>}
+      {error && <div className="error-message">{error}</div>}
+      {success && <div className="success-message">{success}</div>}
     </div>
   );
 }
