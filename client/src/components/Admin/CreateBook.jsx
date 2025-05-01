@@ -8,7 +8,7 @@ function CreateBook() {
     genero: '',
     fechapublicacion: '',
     ideditorial: '',
-    autores: [],
+    autores: '',           
   });
 
   const [editorials, setEditorials] = useState([]);
@@ -18,23 +18,11 @@ function CreateBook() {
 
   useEffect(() => {
     axios.get('http://localhost:4000/api/editoriales')
-      .then(response => {
-        const editorialesData = response.data.map(editorial => ({
-          ...editorial,
-          ideditorial: Number(editorial.ideditorial)
-        }));
-        setEditorials(editorialesData);
-      })
+      .then(res => setEditorials(res.data))
       .catch(() => setError('Error al cargar editoriales'));
 
     axios.get('http://localhost:4000/api/autores')
-      .then(response => {
-        const autoresData = response.data.map(author => ({
-          ...author,
-          id: Number(author.id)
-        }));
-        setAuthors(autoresData);
-      })
+      .then(res => setAuthors(res.data))
       .catch(() => setError('Error al cargar autores'));
   }, []);
 
@@ -42,15 +30,9 @@ function CreateBook() {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'ideditorial' ? Number(value) : value,
-    }));
-  };
-
-  const handleSelectAutores = (e) => {
-    const value = e.target.value;
-    setFormData(prev => ({
-      ...prev,
-      autores: value ? [Number(value)] : []
+      [name]: name === 'ideditorial' || name === 'autores'
+        ? value  
+        : value,
     }));
   };
 
@@ -59,40 +41,37 @@ function CreateBook() {
     setError('');
     setSuccess('');
 
-    // Validación mejorada
-    if (!formData.titulo || !formData.genero || !formData.fechapublicacion || 
-        !formData.ideditorial || formData.autores.length === 0) {
+    const { titulo, genero, fechapublicacion, ideditorial, autores } = formData;
+
+
+    if (!titulo || !genero || !fechapublicacion || !ideditorial || !autores) {
       setError('Todos los campos son obligatorios');
       return;
     }
 
     try {
       const requestData = {
-        titulo: formData.titulo,
-        genero: formData.genero,
-        fechapublicacion: formData.fechapublicacion,
-        ideditorial: Number(formData.ideditorial),
-        autores: formData.autores.map(Number)
+        titulo,
+        genero,
+        fechapublicacion,
+        ideditorial: Number(ideditorial),
+        autores: [Number(autores)], 
       };
-
-      console.log('Datos a enviar:', requestData); // Para depuración
 
       await axios.post('http://localhost:4000/api/admin/books', requestData, {
         headers: { 'Content-Type': 'application/json' }
       });
 
       setSuccess('Libro creado exitosamente');
-      // Resetear formulario
       setFormData({
         titulo: '',
         genero: '',
         fechapublicacion: '',
         ideditorial: '',
-        autores: [],
+        autores: '',
       });
-    } catch (error) {
-      console.error('Error al crear libro:', error);
-      setError(error.response?.data?.message || 'Error al crear el libro');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error al crear el libro');
     }
   };
 
@@ -100,7 +79,7 @@ function CreateBook() {
     <div className="form-container">
       <h2>Crear Nuevo Libro</h2>
       <form onSubmit={handleSubmit}>
-        <div className="form-group">
+      <div className="form-group">
           <label>Título:</label>
           <input
             type="text"
@@ -153,14 +132,14 @@ function CreateBook() {
         <div className="form-group">
           <label>Autor:</label>
           <select
-            name="autores"
-            value={formData.autores[0]}
-            onChange={handleSelectAutores}
+            name="autores"                      
+            value={formData.autores}          
+            onChange={handleChange}           
             required
           >
             <option value="">Seleccione un autor</option>
             {authors.map(author => (
-              <option key={author.id} value={author.id}>
+              <option key={author.idautor} value={author.idautor}>
                 {author.nombre}
               </option>
             ))}
