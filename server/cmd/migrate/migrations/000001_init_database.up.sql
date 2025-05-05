@@ -1,13 +1,12 @@
-
 CREATE TABLE editorial (  
-  ideditorial INT PRIMARY KEY,  
+  ideditorial INT AUTO_INCREMENT PRIMARY KEY,  
   nombre VARCHAR(255),  
   direccion VARCHAR(255),  
   paginaweb VARCHAR(100)  
 );  
   
 CREATE TABLE libro (  
-  idlibro INT PRIMARY KEY,  
+  idlibro INT AUTO_INCREMENT  PRIMARY KEY,  
   ideditorial INT,  
   fechapublicacion DATE,  
   titulo VARCHAR(255),  
@@ -17,13 +16,13 @@ CREATE TABLE libro (
 );  
   
 CREATE TABLE autor (  
-  idautor INT PRIMARY KEY,  
+  idautor INT AUTO_INCREMENT PRIMARY KEY,  
   nombre VARCHAR(255),  
   nacionalidad VARCHAR(100)  
 );  
   
 CREATE TABLE socio (  
-  idsocio INT PRIMARY KEY,  
+  idsocio INT AUTO_INCREMENT  PRIMARY KEY,  
   nombre VARCHAR(255),  
   direccion VARCHAR(255),  
   telefono VARCHAR(50),  
@@ -42,7 +41,7 @@ CREATE TABLE usuariopassword (
 );  
   
 CREATE TABLE prestamo (  
-  idprestamo INT PRIMARY KEY,  
+  idprestamo INT AUTO_INCREMENT  PRIMARY KEY,  
   idsocio INT,  
   idlibro INT,  
   fechaprestamo DATE,  
@@ -52,8 +51,8 @@ CREATE TABLE prestamo (
   FOREIGN KEY (idlibro) REFERENCES libro(idlibro)  
 );  
   
-CREATE TABLE multa (  
-  idmulta INT PRIMARY KEY,  
+CREATE TABLE  multa (  
+  idmulta INT AUTO_INCREMENT  PRIMARY KEY,  
   idprestamo INT,  
   saldopagar DECIMAL(10, 2),  
   fechamulta DATE,  
@@ -70,7 +69,7 @@ CREATE TABLE libro_autor (
 );  
   
 CREATE TABLE reserva (  
-  idreserva INT PRIMARY KEY,  
+  idreserva INT AUTO_INCREMENT  PRIMARY KEY,  
   idsocio INT,  
   idlibro INT,  
   fechareserva DATE,  

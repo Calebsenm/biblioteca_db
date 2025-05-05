@@ -1,66 +1,116 @@
-package main
 
+package main
+/*
 import (
-	"github.com/justinas/alice"
-	"github.com/rs/cors"
+	"github.com/julienschmidt/httprouter"
 	"net/http"
 )
 
+
 func (app *application) routes() http.Handler {
-	mux := http.NewServeMux()
+	router := httprouter.New()
 
-	// Rutas de admistrador 
-	mux.HandleFunc("/", app.home)
-	mux.HandleFunc("GET /api/admin/books", app.getFilteredBooksHandler)
-	mux.HandleFunc("GET /api/admin/books/unavailable", app.getUnavailableBooksHandler)
-	mux.HandleFunc("GET /api/admin/books/available", app.getBooksByGenreAndAuthorHandler)
-	mux.HandleFunc("GET /api/admin/books/published", app.getBooksByPublicationDateHandler)
-	mux.HandleFunc("POST /api/admin/books", app.createBookHandler)
-	mux.HandleFunc("PUT /api/admin/books/{id}", app.updateBookHandler)
+	router.NotFound = http.HandlerFunc(app.notFoundResponse)
+	router.MethodNotAllowed = http.HandlerFunc(app.methodNotAllowedResponse)
 
-	mux.HandleFunc("GET /api/admin/users", app.getUsersByTypeHandler)
-	mux.HandleFunc("GET /api/admin/loans", app.getActiveLoansHandler)
-	mux.HandleFunc("GET /api/admin/fines/to", app.getPendingFinesHandler)
-	mux.HandleFunc("GET /api/admin/fines", app.getUserFinesHandler)
-	mux.HandleFunc("GET /api/admin/reservations", app.getActiveReservationsHandler)
-	mux.HandleFunc("GET /api/admin/loans/history", app.getUserLoanHistoryHandler)
-	
-	// Rutas para Usuario
-	mux.HandleFunc("GET /api/books", app.getBooksAvailableByGenreAndAuthorHandler)
-	mux.HandleFunc("POST /api/loans", app.createLoanHandler)
-	mux.HandleFunc("GET /api/loans", app.getUserActiveLoanStatusHandler)
-	mux.HandleFunc("GET /api/loans/completed", app.getUserCompletedLoanHistoryHandler)
-	mux.HandleFunc("GET /api/fines", app.getUserPendingFinesHandler)
-	mux.HandleFunc("GET /api/reservations", app.getUserActiveReservationsHandler)
+	router.HandlerFunc(http.MethodGet, "/v1/healthcheck", app.healthcheckHandler)
 
-	// Register 
-	mux.HandleFunc("POST /api/login", app.loginHandler)
-	mux.HandleFunc("POST /api/register", app.registerHandler)
+	// Register
+	router.HandlerFunc(http.MethodPost, "/v1/api/login", app.loginHandler)
+	router.HandlerFunc(http.MethodPost, "/v1/api/register", app.registerHandler)
 
-	// Rutas de Gestión de Libros
-	mux.HandleFunc("POST /api/editoriales", app.createEditorialHandler)
-	mux.HandleFunc("GET /api/editoriales", app.getEditorialsHandler)
+	router.HandlerFunc(http.MethodGet, "/v1/api/admin/books", app.requirePermission(PermissionBooksRead, app.getFilteredBooksHandler))
+	router.HandlerFunc(http.MethodGet, "/v1/api/admin/books/unavailable", app.requirePermission(PermissionBooksRead, app.getUnavailableBooksHandler))
+	router.HandlerFunc(http.MethodGet, "/v1/api/admin/books/available", app.requirePermission(PermissionBooksRead, app.getBooksByGenreAndAuthorHandler))
+	router.HandlerFunc(http.MethodGet, "/v1/api/admin/books/published", app.requirePermission(PermissionBooksRead, app.getBooksByPublicationDateHandler))
+	router.HandlerFunc(http.MethodPost, "/v1/api/admin/books", app.requirePermission(PermissionBooksWrite, app.createBookHandler))
+	router.HandlerFunc(http.MethodPost, "/v1/api/admin/books/{id}", app.requirePermission(PermissionBooksWrite, app.updateBookHandler))
+	router.HandlerFunc(http.MethodGet, "/v1/api/books", app.requirePermission(PermissionBooksRead, app.getBooksAvailableByGenreAndAuthorHandler))
+	router.HandlerFunc(http.MethodPost, "/v1/api/admin/users", app.requirePermission(PermissionUsersManage, app.getUsersByTypeHandler))
+	router.HandlerFunc(http.MethodPost, "/v1/api/admin/loans", app.requirePermission(PermissionLoansCreate, app.getActiveLoansHandler))
+	router.HandlerFunc(http.MethodGet, "/v1/api/admin/fines/to", app.requirePermission(PermissionFinesRead, app.getPendingFinesHandler))
+	router.HandlerFunc(http.MethodGet, "/v1/api/admin/fines", app.requirePermission(PermissionFinesRead, app.getUserFinesHandler))
+	router.HandlerFunc(http.MethodGet, "/v1/api/admin/reservations", app.requirePermission(PermissionReservationsView, app.getActiveReservationsHandler))
+	router.HandlerFunc(http.MethodGet, "/v1/api/admin/loans/history", app.requirePermission(PermissionLoansView, app.getUserLoanHistoryHandler))
+	router.HandlerFunc(http.MethodPost, "/v1/api/loans", app.requirePermission(PermissionLoansCreate, app.createLoanHandler))
+	router.HandlerFunc(http.MethodGet, "/v1/api/loans", app.requirePermission(PermissionLoansView, app.getUserActiveLoanStatusHandler))
+	router.HandlerFunc(http.MethodGet, "/v1/api/loans", app.requirePermission(PermissionLoansView, app.getUserActiveLoanStatusHandler))
+	router.HandlerFunc(http.MethodGet, "/v1/api/loans/completed", app.requirePermission(PermissionLoansView, app.getUserCompletedLoanHistoryHandler))
+	router.HandlerFunc(http.MethodGet, "/v1/api/fines", app.requirePermission(PermissionFinesRead, app.getUserPendingFinesHandler))
+	router.HandlerFunc(http.MethodGet, "/v1/api/reservations", app.requirePermission(PermissionReservationsView, app.getUserActiveReservationsHandler))
 
-	// Get the Authors
-	mux.HandleFunc("POST /api/admin/autores" , app.createAutorHander)
-	mux.HandleFunc("GET /api/autores", app.getAutoresHandler)
+	router.HandlerFunc(http.MethodPost, "/v1/api/editoriales", app.createEditorialHandler)
+	router.HandlerFunc(http.MethodGet, "/v1/api/editoriales", app.getEditorialsHandler)
+	router.HandlerFunc(http.MethodPost, "/v1/api/admin/autores", app.createAutorHander)
+	router.HandlerFunc(http.MethodGet, "/v1/api/autores", app.getAutoresHandler)
 
-	// Rutas de Gestión de Reservas
-	mux.HandleFunc("POST /api/reservation", app.createReservation)
-	mux.HandleFunc("DELETE /api/reservations/{id}", app.cancelReservationHandler)
+	router.HandlerFunc(http.MethodPost, "/v1/api/reservation", app.createReservation)
+	router.HandlerFunc(http.MethodDelete, "/v1/api/reservations/{id}", app.cancelReservationHandler)
+	router.HandlerFunc(http.MethodPost, "/v1/api/loans/extend/{id}", app.extendLoanHandler)
 
-	// Rutas de Gestión de Préstamos
-	mux.HandleFunc("POST /api/loans/extend/{id}", app.extendLoanHandler) // POST - Extender préstamo
+	return app.recoverPanic(app.enableCORS(app.rateLimit(app.authenticate(router))))
+}
+*/
 
-	c := cors.New(cors.Options{
-		//AllowedOrigins:   []string{"http://127.0.0.1:3000"}, 
-		AllowedOrigins:   []string{"http://localhost:3000"},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Content-Type", "Authorization"},
-		AllowCredentials: true,
-	})
 
-	standard := alice.New(app.recoverPanic, app.logRequest, secureHeaders , c.Handler)
+import (
+    "net/http"
+)
 
-	return standard.Then(mux)
+// routes configura todas las rutas usando http.ServeMux (Go 1.24).
+func (app *application) routes() http.Handler {
+    mux := http.NewServeMux()
+
+    // Rutas de estado
+    mux.HandleFunc("GET /v1/healthcheck", app.healthcheckHandler)
+
+    // Autenticación
+    mux.HandleFunc("POST /v1/api/login",      app.loginHandler)
+    mux.HandleFunc("POST /v1/api/register",   app.registerHandler)
+
+    // Admin - Libros
+    mux.HandleFunc("GET    /v1/api/admin/books",            app.requirePermission(PermissionBooksRead, app.getFilteredBooksHandler))
+    mux.HandleFunc("GET    /v1/api/admin/books/unavailable",app.requirePermission(PermissionBooksRead, app.getUnavailableBooksHandler))
+    mux.HandleFunc("GET    /v1/api/admin/books/available",  app.requirePermission(PermissionBooksRead, app.getBooksByGenreAndAuthorHandler))
+    mux.HandleFunc("GET    /v1/api/admin/books/published",  app.requirePermission(PermissionBooksRead, app.getBooksByPublicationDateHandler))
+    mux.HandleFunc("POST   /v1/api/admin/books",           app.requirePermission(PermissionBooksWrite, app.createBookHandler))
+    mux.HandleFunc("POST   /v1/api/admin/books/{id}",      app.requirePermission(PermissionBooksWrite, app.updateBookHandler))
+
+    // Usuario - Libros disponibles
+    mux.HandleFunc("GET  /v1/api/books", app.requirePermission(PermissionBooksRead, app.getBooksAvailableByGenreAndAuthorHandler))
+
+    // Admin - Usuarios, préstamos, multas, reservas
+    mux.HandleFunc("POST /v1/api/admin/users",               app.requirePermission(PermissionUsersManage, app.getUsersByTypeHandler))
+    mux.HandleFunc("POST /v1/api/admin/loans",               app.requirePermission(PermissionLoansCreate, app.getActiveLoansHandler))
+    mux.HandleFunc("GET  /v1/api/admin/fines/to",            app.requirePermission(PermissionFinesRead, app.getPendingFinesHandler))
+    mux.HandleFunc("GET  /v1/api/admin/fines",               app.requirePermission(PermissionFinesRead, app.getUserFinesHandler))
+    mux.HandleFunc("GET  /v1/api/admin/reservations",        app.requirePermission(PermissionReservationsView, app.getActiveReservationsHandler))
+    mux.HandleFunc("GET  /v1/api/admin/loans/history",       app.requirePermission(PermissionLoansView, app.getUserLoanHistoryHandler))
+
+    // Usuario - Préstamos y multas
+    mux.HandleFunc("POST /v1/api/loans",                     app.requirePermission(PermissionLoansCreate, app.createLoanHandler))
+    mux.HandleFunc("GET  /v1/api/loans",                     app.requirePermission(PermissionLoansView,   app.getUserActiveLoanStatusHandler))
+    mux.HandleFunc("GET  /v1/api/loans/completed",           app.requirePermission(PermissionLoansView,   app.getUserCompletedLoanHistoryHandler))
+    mux.HandleFunc("GET  /v1/api/fines",                     app.requirePermission(PermissionFinesRead,   app.getUserPendingFinesHandler))
+    mux.HandleFunc("GET  /v1/api/reservations",              app.requirePermission(PermissionReservationsView, app.getUserActiveReservationsHandler))
+
+    // Editoriales y autores
+    mux.HandleFunc("POST /v1/api/editoriales", app.createEditorialHandler)
+    mux.HandleFunc("GET  /v1/api/editoriales", app.getEditorialsHandler)
+    mux.HandleFunc("POST /v1/api/admin/autores", app.createAutorHander)
+    mux.HandleFunc("GET  /v1/api/autores",       app.getAutoresHandler)
+
+    // Reservas y extensiones
+    mux.HandleFunc("POST   /v1/api/reservation",         app.createReservation)
+    mux.HandleFunc("DELETE /v1/api/reservations/{id}",   app.cancelReservationHandler)
+    mux.HandleFunc("POST   /v1/api/loans/extend/{id}",   app.extendLoanHandler)
+
+    // Encadenar middlewares
+    return app.recoverPanic(
+        app.enableCORS(
+            app.rateLimit(
+                app.authenticate(mux),
+            ),
+        ),
+    )
 }
