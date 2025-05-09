@@ -26,7 +26,6 @@ type RegisterRequest struct {
 	TipoSocio       string   `json:"tipo_socio"`
 	Contrasena      password `json:"-"`
 	Rol             string   `json:"rol"`
-	Activated       bool     `json:"activated"`
 }
 
 type Usuario struct {
@@ -91,7 +90,8 @@ func ValidateUser(v *validator.Validator, user *RegisterRequest) {
 	v.Check(user.Direccion != "", "direccion", "debe ser proporcionada")
 	v.Check(user.Telefono != "", "telefono", "debe ser proporcionado")
 	v.Check(user.Correo != "", "correo", "debe ser proporcionado")
-	ValidateEmail(v, user.Correo)
+	v.Check(validator.Matches(user.Correo, validator.EmailRX), "correo", "debe ser un correo valido	")
+
 
 	v.Check(user.FechaNacimiento != "", "fecha_nacimiento", "debe ser proporcionada")
 	_, err := time.Parse("2006-01-02", user.FechaNacimiento)

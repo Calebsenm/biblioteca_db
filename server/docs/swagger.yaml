@@ -1,0 +1,94 @@
+basePath: /v1/
+definitions:
+  main.Credentials:
+    properties:
+      contrasena:
+        type: string
+      correo:
+        type: string
+    type: object
+  main.RegisterRequest:
+    properties:
+      contrasena:
+        type: string
+      correo:
+        type: string
+      direccion:
+        type: string
+      fecha_nacimiento:
+        type: string
+      nombre:
+        type: string
+      rol:
+        type: string
+      telefono:
+        type: string
+      tipo_socio:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: Rest-Api for library
+  title: BibliotecaAPI
+  version: "1.0"
+paths:
+  /api/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Credenciales de login
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/main.Credentials'
+      produces:
+      - application/json
+      responses: {}
+      summary: Login
+      tags:
+      - Login
+  /api/register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Register credentials
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/main.RegisterRequest'
+      produces:
+      - application/json
+      responses: {}
+      summary: Register
+      tags:
+      - Register
+  /healthcheck:
+    get:
+      consumes:
+      - application/json
+      description: Provides information about the current system status and version
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              status:
+                type: string
+              system_info:
+                properties:
+                  environment:
+                    type: string
+                  version:
+                    type: string
+                type: object
+            type: object
+      summary: Check system status
+      tags:
+      - health
+swagger: "2.0"

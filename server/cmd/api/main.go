@@ -15,7 +15,7 @@ import (
 	"biblioteca/internal/jsonlog"
 	"biblioteca/internal/mailer"
 	"biblioteca/internal/vcs"
-
+    _ "biblioteca/docs"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -65,6 +65,11 @@ type application struct {
 	authenticator auth.Authenticator
 }
 
+
+// @title           BibliotecaAPI 
+// @version         1.0
+// @description     Rest-Api for library 
+// @BasePath        /v1/
 func main() {
 	var cfg config
 

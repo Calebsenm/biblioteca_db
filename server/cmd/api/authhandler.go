@@ -35,62 +35,68 @@ type RegisterRequest struct {
 }
 
 const (
-    // Permisos para libros
-    PermissionBooksRead   = "books:read"
-    PermissionBooksWrite  = "books:write"
-    PermissionBooksDelete = "books:delete"
-    
-    // Permisos para préstamos
-    PermissionLoansCreate = "loans:create"
-    PermissionLoansView   = "loans:view"
-    PermissionLoansManage = "loans:manage"
-    
-    // Permisos para usuarios
-    PermissionUsersView   = "users:view"
-    PermissionUsersManage = "users:manage"
-    
-    // Permisos especiales
-    PermissionReportsGenerate = "reports:generate"
+	// Permisos para libros
+	PermissionBooksRead   = "books:read"
+	PermissionBooksWrite  = "books:write"
+	PermissionBooksDelete = "books:delete"
 
-	// Permisos para multas. 
-	PermissionFinesRead = "fines:read"
+	// Permisos para préstamos
+	PermissionLoansCreate = "loans:create"
+	PermissionLoansView   = "loans:view"
+	PermissionLoansManage = "loans:manage"
+
+	// Permisos para usuarios
+	PermissionUsersView   = "users:view"
+	PermissionUsersManage = "users:manage"
+
+	// Permisos especiales
+	PermissionReportsGenerate = "reports:generate"
+
+	// Permisos para multas.
+	PermissionFinesRead   = "fines:read"
 	PermissionFinesCreate = "fines:create"
 
-	// Para reservas 
+	// Para reservas
 	PermissionReservationsCreate = "reservations:create"
 	PermissionReservationsView   = "reservations:view"
 )
 
 // Conjuntos de permisos por rol
 var (
-    UserPermissions = []string{
-        PermissionBooksRead,
-        PermissionLoansCreate,
-        PermissionLoansView,
+	UserPermissions = []string{
+		PermissionBooksRead,
+		PermissionLoansCreate,
+		PermissionLoansView,
 		PermissionFinesRead,
 		PermissionReservationsCreate,
-    }
-    
-    AdminPermissions = []string{
-        PermissionBooksRead,
-        PermissionBooksWrite,
-        PermissionBooksDelete,
-        PermissionLoansManage,
-        PermissionUsersView,
-        PermissionUsersManage,
-        PermissionReportsGenerate,
+	}
+
+	AdminPermissions = []string{
+		PermissionBooksRead,
+		PermissionBooksWrite,
+		PermissionBooksDelete,
+		PermissionLoansManage,
+		PermissionUsersView,
+		PermissionUsersManage,
+		PermissionReportsGenerate,
 		PermissionFinesRead,
 		PermissionFinesCreate,
 		PermissionReservationsView,
-    }
+	}
 )
 
 
+// @Summary     Login 
+// @Tags        Login 
+// @Accept      json
+// @Produce     json
+// @Param       payload body        Credentials true "Credenciales de login"
+// @Router      /api/login [post]
 func (app *application) loginHandler(w http.ResponseWriter, r *http.Request) {
 
 	var credentials Credentials
 
-	err := json.NewDecoder(r.Body).Decode(&credentials)
+	err := app.readJSON(w, r, &credentials)
 	if err != nil {
 		app.badRequestResponse(w, r, err)
 		return
@@ -129,11 +135,11 @@ func (app *application) loginHandler(w http.ResponseWriter, r *http.Request) {
 
 	claims := jwt.MapClaims{
 		"userId": user.ID,
-		"exp": time.Now().Add(app.config.jwt.exp).Unix(),
-		"iat": time.Now().Unix(),
-		"nbf": time.Now().Unix(),
-		"iss": app.config.jwt.iss,
-		"aud": app.config.jwt.iss,
+		"exp":    time.Now().Add(app.config.jwt.exp).Unix(),
+		"iat":    time.Now().Unix(),
+		"nbf":    time.Now().Unix(),
+		"iss":    app.config.jwt.iss,
+		"aud":    app.config.jwt.iss,
 	}
 
 	token, err := app.authenticator.GenerateToken(claims)
@@ -152,25 +158,32 @@ func (app *application) loginHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+
+
+// @Summary     Register  
+// @Tags        Register  
+// @Accept      json
+// @Produce     json
+// @Param       payload body  RegisterRequest true "Register credentials"
+// @Router      /api/register [post]
 func (app *application) registerHandler(w http.ResponseWriter, r *http.Request) {
 
-	var req RegisterRequest 
+	var req RegisterRequest
 
-	err := json.NewDecoder(r.Body).Decode(&req)
+	err := app.readJSON(w, r, &req)
 	if err != nil {
-		http.Error(w, "Error al decodificar la solicitud", http.StatusBadRequest)
+		app.badRequestResponse(w, r, err)
 		return
 	}
 
 	user := &data.RegisterRequest{
-		Nombre: req.Nombre,
-		Direccion: req.Direccion,
-		Telefono: req.Telefono,
-		Correo:  req.Correo,
+		Nombre:          req.Nombre,
+		Direccion:       req.Direccion,
+		Telefono:        req.Telefono,
+		Correo:          req.Correo,
 		FechaNacimiento: req.FechaNacimiento,
-		TipoSocio: req.TipoSocio,
-		Rol: req.TipoSocio,
-		Activated: false,
+		TipoSocio:       req.TipoSocio,
+		Rol:             req.TipoSocio,
 	}
 
 	err = user.Contrasena.Set(req.Contrasena)
@@ -180,7 +193,9 @@ func (app *application) registerHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	v := validator.New()
-	if data.ValidateUser(v, user); !v.Valid() {
+	data.ValidateUser(v, user)
+
+	if !v.Valid() {
 		app.failedValidationResponse(w, r, v.Errors)
 		return
 	}
@@ -199,20 +214,19 @@ func (app *application) registerHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	var permissionsToAdd []string
-    if user.Rol == "admnin" {
-        permissionsToAdd = AdminPermissions
-    } else {
-        permissionsToAdd = UserPermissions
-    }
-    
-	if err := app.models.Permissions.AddForUser( user.ID , permissionsToAdd...); err != nil {
+	if user.Rol == "admnin" {
+		permissionsToAdd = AdminPermissions
+	} else {
+		permissionsToAdd = UserPermissions
+	}
+
+	if err := app.models.Permissions.AddForUser(user.ID, permissionsToAdd...); err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
 	}
-	
+
 	err = app.writeJSON(w, http.StatusAccepted, envelope{"user": user}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
 }
-
