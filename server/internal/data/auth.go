@@ -17,7 +17,7 @@ var (
 var AnonymousUser = &RegisterRequest{}
 
 type RegisterRequest struct {
-	ID              int64    `json:"id"`
+	ID              int64      `json:"id"`
 	Nombre          string   `json:"nombre"`
 	Direccion       string   `json:"direccion"`
 	Telefono        string   `json:"telefono"`
@@ -29,7 +29,7 @@ type RegisterRequest struct {
 }
 
 type Usuario struct {
-	ID       int      `json:"id"`
+	ID       int64      `json:"id"`
 	Nombre   string   `json:"nombre"`
 	Rol      string   `json:"rol"`
 	Email    string   `json:"email"`
@@ -92,7 +92,6 @@ func ValidateUser(v *validator.Validator, user *RegisterRequest) {
 	v.Check(user.Correo != "", "correo", "debe ser proporcionado")
 	v.Check(validator.Matches(user.Correo, validator.EmailRX), "correo", "debe ser un correo valido	")
 
-
 	v.Check(user.FechaNacimiento != "", "fecha_nacimiento", "debe ser proporcionada")
 	_, err := time.Parse("2006-01-02", user.FechaNacimiento)
 	v.Check(err == nil, "fecha_nacimiento", "debe tener formato YYYY-MM-DD")
@@ -126,7 +125,7 @@ func (m UserModel) GetUserByEmail(email string) (*Usuario, error) {
 		&usuario.ID,
 		&usuario.Nombre,
 		&usuario.Rol,
-		&usuario.Password,
+		&usuario.Password.hash,
 	)
 
 	if err != nil {

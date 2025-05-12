@@ -101,7 +101,7 @@ func (app *application) loginHandler(w http.ResponseWriter, r *http.Request) {
 		app.badRequestResponse(w, r, err)
 		return
 	}
-
+	
 	v := validator.New()
 	data.ValidateEmail(v, credentials.Correo)
 	data.ValidatePasswordPlaintext(v, credentials.Contrasena)
@@ -158,8 +158,6 @@ func (app *application) loginHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-
-
 // @Summary     Register  
 // @Tags        Register  
 // @Accept      json
@@ -183,8 +181,9 @@ func (app *application) registerHandler(w http.ResponseWriter, r *http.Request) 
 		Correo:          req.Correo,
 		FechaNacimiento: req.FechaNacimiento,
 		TipoSocio:       req.TipoSocio,
-		Rol:             req.TipoSocio,
+		Rol:             req.Rol,
 	}
+
 
 	err = user.Contrasena.Set(req.Contrasena)
 	if err != nil {
@@ -194,6 +193,8 @@ func (app *application) registerHandler(w http.ResponseWriter, r *http.Request) 
 
 	v := validator.New()
 	data.ValidateUser(v, user)
+
+	
 
 	if !v.Valid() {
 		app.failedValidationResponse(w, r, v.Errors)

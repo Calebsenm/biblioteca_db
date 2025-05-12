@@ -6,6 +6,11 @@ import (
 )
 
 
+// @Sumary  Authors  
+// @Tags    Authors 
+// @Accept  json 
+// @Produce json 
+// @Router  /api/autores [get] 
 func (app *application) getAutoresHandler(w http.ResponseWriter, r *http.Request) {
 
 	authors , err  := app.models.Autor.GetAutores()

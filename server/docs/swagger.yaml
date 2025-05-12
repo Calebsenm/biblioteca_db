@@ -32,6 +32,15 @@ info:
   title: BibliotecaAPI
   version: "1.0"
 paths:
+  /api/autores:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses: {}
+      tags:
+      - Authors
   /api/login:
     post:
       consumes:

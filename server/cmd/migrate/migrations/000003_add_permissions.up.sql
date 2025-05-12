@@ -32,5 +32,5 @@ VALUES
     ('fines:read'),
     ('fines:create'),
     ('reservations:create'),
-    ('reservations:view'):
+    ('reservations:view');
 
