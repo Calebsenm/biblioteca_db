@@ -221,7 +221,9 @@ func (app *application) registerHandler(w http.ResponseWriter, r *http.Request) 
 		permissionsToAdd = UserPermissions
 	}
 
-	if err := app.models.Permissions.AddForUser(user.ID, permissionsToAdd...); err != nil {
+	err = app.models.Permissions.AddForUser(user.ID, permissionsToAdd...);
+
+	if  err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
 	}

@@ -81,9 +81,11 @@ func (m PermissionModel) AddForUser(userID int64, codes ...string) error {
 		SELECT ?, id FROM permissions WHERE code IN (%s)
 	`, strings.Join(placeholders, ", "))
 
+
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
 	_, err := m.DB.ExecContext(ctx, query, args...)
+	
 	return err
 }

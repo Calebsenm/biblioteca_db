@@ -200,6 +200,9 @@ func (m UserModel) Insert(user *RegisterRequest) error {
 	if err != nil {
 		return err
 	}
+	
+	// add the ide to the object 
+	user.ID = socioID
 
 	queryInsertPassword := `
 		INSERT INTO usuariopassword (idusuario, hash_contrasena)

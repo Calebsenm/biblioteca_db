@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-
+// getAutoresHandler godoc
 // @Sumary  Authors  
 // @Tags    Authors 
 // @Accept  json 
