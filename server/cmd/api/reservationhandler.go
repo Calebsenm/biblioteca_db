@@ -6,6 +6,15 @@ import (
 	"net/http"
 )
 
+// @Summary Create reservation
+// @Description Create a new book reservation
+// @Tags Reservas
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param reservation body data.Reservation true "Reservation data"
+// @Success 201 {object} data.Reservation
+// @Router /api/reservation [post]
 func (app *application) createReservation(w http.ResponseWriter, r *http.Request) {
 
 	var input data.Reservation
@@ -35,6 +44,15 @@ func (app *application) createReservation(w http.ResponseWriter, r *http.Request
 	}
 }
 
+// @Summary Cancel reservation
+// @Description Cancel an existing reservation
+// @Tags Reservas
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Reservation ID"
+// @Success 200 {string} string "Reservation cancelled successfully"
+// @Router /api/reservations/{id} [delete]
 func (app *application) cancelReservationHandler(w http.ResponseWriter, r *http.Request) {
 
 	reservationID := r.PathValue("id")
@@ -54,15 +72,27 @@ func (app *application) cancelReservationHandler(w http.ResponseWriter, r *http.
 	w.Write([]byte("Reserva cancelada exitosamente"))
 }
 
+// @Summary Get active reservations
+// @Description Get active reservations with filters
+// @Tags Reservas
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param idsocio query string false "User ID"
+// @Param idlibro query string false "Book ID"
+// @Param fechareserva query string false "Reservation date"
+// @Param nombre_socio query string false "User name"
+// @Success 200 {array} data.Reservation
+// @Router /api/admin/reservations [get]
 func (app *application) getActiveReservationsHandler(w http.ResponseWriter, r *http.Request) {
 	
-	usuario := r.URL.Query().Get("usuarioid")
-	libro := r.URL.Query().Get("libro")
-	fecha := r.URL.Query().Get("fecha")
-	nombreSocio := r.URL.Query().Get("nombre")
+	idsocio := r.URL.Query().Get("idsocio")
+	idlibro := r.URL.Query().Get("idlibro")
+	fechareserva := r.URL.Query().Get("fechareserva")
+	nombreSocio := r.URL.Query().Get("nombre_socio")
 
 	
-	reservations , err := app.models.Reservation.GetActiveReservations(usuario , libro , fecha , nombreSocio)
+	reservations , err := app.models.Reservation.GetActiveReservations(idsocio , idlibro , fechareserva , nombreSocio)
 	if err != nil {
 		app.badRequestResponse(w , r , err )
 		return 
@@ -76,7 +106,14 @@ func (app *application) getActiveReservationsHandler(w http.ResponseWriter, r *h
 	
 }
 
-
+// @Summary Get user active reservations
+// @Description Get active reservations for a specific user
+// @Tags Reservas
+// @Accept json
+// @Produce json
+// @Param usuario_id query string true "User ID"
+// @Success 200 {array} data.Reservation
+// @Router /api/reservations [get]
 func (app *application) getUserActiveReservationsHandler(w http.ResponseWriter, r *http.Request) {
 
 

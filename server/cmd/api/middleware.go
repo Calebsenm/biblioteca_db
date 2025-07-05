@@ -130,6 +130,8 @@ func (app *application) authenticate(next http.Handler) http.Handler {
 		}
 		r = app.contextSetUser(r, user)
 		next.ServeHTTP(w, r)
+
+	
 	})
 }
 
@@ -164,6 +166,7 @@ func (app *application) requirePermission(code string, next http.HandlerFunc) ht
 
 		if !permissions.Include(code) {
 			app.notPermittedResponse(w, r)
+		
 			return
 		}
 

@@ -31,6 +31,10 @@ VALUES
     ('reports:generate'),
     ('fines:read'),
     ('fines:create'),
+    ('publishers:read'), 
+    ('publishers:create'), 
+    ('authors:read'), 
+    ('authors:create'), 
     ('reservations:create'),
     ('reservations:view');
 

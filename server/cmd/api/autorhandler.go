@@ -6,11 +6,14 @@ import (
 )
 
 // getAutoresHandler godoc
-// @Sumary  Authors  
-// @Tags    Authors 
-// @Accept  json 
-// @Produce json 
-// @Router  /api/autores [get] 
+// @Summary Get all authors
+// @Description Returns all authors
+// @Tags Authors
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Success 200 {array} data.Author
+// @Router /api/autores [get]
 func (app *application) getAutoresHandler(w http.ResponseWriter, r *http.Request) {
 
 	authors , err  := app.models.Autor.GetAutores()
@@ -19,18 +22,25 @@ func (app *application) getAutoresHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	err = app.writeJSON(w, http.StatusAccepted, envelope{"user": authors}, nil)
+	err = app.writeJSON(w, http.StatusAccepted, envelope{"authors": authors}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
 }
 
+// getAutoresHandler godoc
+// @Summary Create author
+// @Description Create a new author
+// @Tags Authors
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param payload body data.NewAuthor true "Create an author"
+// @Success 201 {object} data.Author
+// @Router /api/admin/autores [post]
 func (app *application) createAutorHander(w http.ResponseWriter, r *http.Request) {
-	var input struct {
-		Name        string `json:"name"`
-		Nationality string `json:"nationality"`
-	}
-
+	var input data.NewAuthor
+	
 	err :=  app.readJSON(w , r , &input)
 	if err != nil {
 		app.badRequestResponse(w, r, err)
@@ -48,7 +58,7 @@ func (app *application) createAutorHander(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	err = app.writeJSON(w, http.StatusAccepted, envelope{"user": author}, nil)
+	err = app.writeJSON(w, http.StatusAccepted, envelope{"author": author}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}

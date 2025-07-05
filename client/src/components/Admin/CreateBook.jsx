@@ -1,156 +1,158 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import '../../styles/CreateBook.css';
+import React, { useEffect } from 'react';
+import { useApiGet, useApiMutation, useForm } from '../../hooks/useApi';
+import { bookService } from '../../services/bookService';
+import { editorialService } from '../../services/editorialService';
+import { authorService } from '../../services/authorService';
+import '../../styles/admin/CreateBook.css';
 
 function CreateBook() {
-  const [formData, setFormData] = useState({
+  const { formData, handleChange, resetForm } = useForm({
     titulo: '',
     genero: '',
     fechapublicacion: '',
     ideditorial: '',
-    autores: '',           
+    idautores: '',
   });
 
-  const [editorials, setEditorials] = useState([]);
-  const [authors, setAuthors] = useState([]);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const { data: editorialsData, loading: editorialsLoading, error: editorialsError } = useApiGet(
+    editorialService.getEditorials,
+    []
+  );
 
-  useEffect(() => {
-    axios.get('http://localhost:4000/api/editoriales')
-      .then(res => setEditorials(res.data))
-      .catch(() => setError('Error al cargar editoriales'));
+  const { data: authorsData, loading: authorsLoading, error: authorsError } = useApiGet(
+    authorService.getAuthors,
+    []
+  );
 
-    axios.get('http://localhost:4000/api/autores')
-      .then(res => setAuthors(res.data))
-      .catch(() => setError('Error al cargar autores'));
-  }, []);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: name === 'ideditorial' || name === 'autores'
-        ? value  
-        : value,
-    }));
-  };
+  const { execute: createBook, loading: createLoading, error: createError, success: createSuccess, reset: resetCreate } = useApiMutation(
+    (data) => bookService.createBook({
+      ...data,
+      ideditorial: Number(data.ideditorial),
+      idautores: [Number(data.idautores)],
+    })
+  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    
+    const { titulo, genero, fechapublicacion, ideditorial, idautores } = formData;
 
-    const { titulo, genero, fechapublicacion, ideditorial, autores } = formData;
-
-
-    if (!titulo || !genero || !fechapublicacion || !ideditorial || !autores) {
-      setError('Todos los campos son obligatorios');
+    if (!titulo || !genero || !fechapublicacion || !ideditorial || !idautores) {
       return;
     }
 
     try {
-      const requestData = {
-        titulo,
-        genero,
-        fechapublicacion,
-        ideditorial: Number(ideditorial),
-        autores: [Number(autores)], 
-      };
-
-      await axios.post('http://localhost:4000/api/admin/books', requestData, {
-        headers: { 'Content-Type': 'application/json' }
-      });
-
-      setSuccess('Libro creado exitosamente');
-      setFormData({
-        titulo: '',
-        genero: '',
-        fechapublicacion: '',
-        ideditorial: '',
-        autores: '',
-      });
-    } catch (err) {
-      setError(err.response?.data?.message || 'Error al crear el libro');
+      await createBook(formData);
+      resetForm();
+    } catch (error) {
+      // El error se maneja en el hook
     }
   };
+
+  const editorials = editorialsData?.editorials || [];
+  const authors = authorsData?.authors || authorsData?.author || [];
 
   return (
     <div className="form-container">
       <h2>Crear Nuevo Libro</h2>
+      
+      {(editorialsError || authorsError) && (
+        <div className="error-message">
+          Error al cargar los datos necesarios
+        </div>
+      )}
+      
       <form onSubmit={handleSubmit}>
-      <div className="form-group">
-          <label>Título:</label>
+        <div className="form-group">
           <input
             type="text"
             name="titulo"
             value={formData.titulo}
             onChange={handleChange}
             required
+            placeholder="Título"
           />
         </div>
 
         <div className="form-group">
-          <label>Género:</label>
           <input
             type="text"
             name="genero"
             value={formData.genero}
             onChange={handleChange}
             required
+            placeholder="Género"
           />
         </div>
 
         <div className="form-group">
-          <label>Fecha de Publicación:</label>
           <input
             type="date"
             name="fechapublicacion"
             value={formData.fechapublicacion}
             onChange={handleChange}
             required
+            placeholder="Fecha de Publicación"
           />
         </div>
 
         <div className="form-group">
-          <label>Editorial:</label>
           <select
             name="ideditorial"
             value={formData.ideditorial}
             onChange={handleChange}
             required
+            disabled={editorialsLoading}
           >
             <option value="">Seleccione una editorial</option>
-            {editorials.map(editorial => (
-              <option key={editorial.ideditorial} value={editorial.ideditorial}>
-                {editorial.nombre}
+            {editorials.length > 0 ? (
+              editorials.map(editorial => (
+                <option key={editorial.ideditorial} value={editorial.ideditorial}>
+                  {editorial.nombre}
+                </option>
+              ))
+            ) : (
+              <option disabled>
+                {editorialsLoading ? 'Cargando editoriales...' : 'No hay editoriales disponibles'}
               </option>
-            ))}
+            )}
           </select>
         </div>
 
         <div className="form-group">
-          <label>Autor:</label>
           <select
-            name="autores"                      
-            value={formData.autores}          
-            onChange={handleChange}           
+            name="idautores"
+            value={formData.idautores}
+            onChange={handleChange}
             required
+            disabled={authorsLoading}
           >
             <option value="">Seleccione un autor</option>
-            {authors.map(author => (
-              <option key={author.idautor} value={author.idautor}>
-                {author.nombre}
+            {authors.length > 0 ? (
+              authors.map(author => (
+                <option key={author.idautor} value={author.idautor}>
+                  {author.nombre}
+                </option>
+              ))
+            ) : (
+              <option disabled>
+                {authorsLoading ? 'Cargando autores...' : 'No hay autores disponibles'}
               </option>
-            ))}
+            )}
           </select>
         </div>
 
-        <button type="submit" className="submit-btn">Crear Libro</button>
+        <button 
+          type="submit" 
+          className="submit-btn"
+          disabled={createLoading || editorialsLoading || authorsLoading}
+        >
+          {createLoading ? 'Creando...' : 'Crear Libro'}
+        </button>
       </form>
 
-      {error && <div className="error-message">{error}</div>}
-      {success && <div className="success-message">{success}</div>}
+      {createError && <div className="error-message">{createError}</div>}
+      {createSuccess && <div className="success-message">Libro creado exitosamente</div>}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import "../styles/Register.css";
+import "../styles/user/Register.css";
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -17,7 +17,6 @@ function Register() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -26,12 +25,8 @@ function Register() {
     }));
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
-
     if (
       !formData.nombre ||
       !formData.direccion ||
@@ -43,10 +38,8 @@ function Register() {
       setError('Todos los campos son obligatorios');
       return;
     }
-
     try {
-
-      const response = await axios.post('http://localhost:4000/api/register', formData, {
+      const response = await axios.post('http://localhost:4000/v1/api/register', formData, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -76,27 +69,24 @@ function Register() {
             />
           </div>
           <div className='input-group'>
-
             <input
               type="text"
               name="direccion"
-              placeholder='Direccion'
+              placeholder='Dirección'
               value={formData.direccion}
               onChange={handleChange}
             />
           </div>
           <div className='input-group'>
-
             <input
               type="text"
               name="telefono"
-              placeholder='Telefono'
+              placeholder='Teléfono'
               value={formData.telefono}
               onChange={handleChange}
             />
           </div>
           <div className='input-group'>
-
             <input
               type="email"
               name="correo"
@@ -106,27 +96,24 @@ function Register() {
             />
           </div>
           <div className='input-group'>
-
             <input
               type="password"
               name="contrasena"
-              placeholder='Contrasena'
+              placeholder='Contraseña'
               value={formData.contrasena}
               onChange={handleChange}
             />
           </div>
           <div className='input-group'>
-            <label>Fecha Nacimiento:</label>
             <input
               type="date"
               name="fecha_nacimiento"
-              placeholder='Fecha Nacimiento'
+              placeholder='Fecha de Nacimiento'
               value={formData.fecha_nacimiento}
               onChange={handleChange}
             />
           </div>
           <div className='input-group'>
-            <label>Tipo de Socio:</label>
             <select
               name="tipo_socio"
               className='inputs'
@@ -138,9 +125,7 @@ function Register() {
               <option value="profesor">Profesor</option>
             </select>
           </div>
-
           <div className='input-group'>
-            <label>Rol:</label>
             <select
               className='inputs'
               name="rol"
@@ -151,11 +136,10 @@ function Register() {
               <option value="administrador">Administrador</option>
             </select>
           </div>
-          <button type="submit" className='login-btn'>Registrar </button>
+          <button type="submit" className='login-btn'>Registrar</button>
         </form>
-
-        {error && <div style={{ color: 'red' }}>{error}</div>}
-        {success && <div style={{ color: 'green' }}>{success}</div>}
+        {error && <div className="error-message">{error}</div>}
+        {success && <div className="success-message">{success}</div>}
       </div>
     </div>
   );

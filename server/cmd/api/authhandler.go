@@ -59,6 +59,14 @@ const (
 	// Para reservas
 	PermissionReservationsCreate = "reservations:create"
 	PermissionReservationsView   = "reservations:view"
+
+	// Permisos para editoriales
+	PublishersRead   = "publishers:read"
+	PublishersCreate = "publishers:create"
+
+	// Permisos para autores
+	AauthorsRead  = "authors:read"
+	AuthorsCreate = "authors:create"
 )
 
 // Conjuntos de permisos por rol
@@ -68,13 +76,21 @@ var (
 		PermissionLoansCreate,
 		PermissionLoansView,
 		PermissionFinesRead,
+		PermissionFinesCreate,
 		PermissionReservationsCreate,
+		PermissionReservationsView,
+		PublishersRead,
+		PublishersCreate,
+		AauthorsRead,
+		AuthorsCreate,
 	}
 
 	AdminPermissions = []string{
 		PermissionBooksRead,
 		PermissionBooksWrite,
 		PermissionBooksDelete,
+		PermissionLoansCreate,
+		PermissionLoansView,
 		PermissionLoansManage,
 		PermissionUsersView,
 		PermissionUsersManage,
@@ -82,12 +98,15 @@ var (
 		PermissionFinesRead,
 		PermissionFinesCreate,
 		PermissionReservationsView,
+		PublishersRead,
+		PublishersCreate,
+		AauthorsRead,
+		AuthorsCreate,
 	}
 )
 
-
-// @Summary     Login 
-// @Tags        Login 
+// @Summary     Login a los Usuarios
+// @Tags        Autenticacion
 // @Accept      json
 // @Produce     json
 // @Param       payload body        Credentials true "Credenciales de login"
@@ -101,7 +120,7 @@ func (app *application) loginHandler(w http.ResponseWriter, r *http.Request) {
 		app.badRequestResponse(w, r, err)
 		return
 	}
-	
+
 	v := validator.New()
 	data.ValidateEmail(v, credentials.Correo)
 	data.ValidatePasswordPlaintext(v, credentials.Contrasena)
@@ -158,8 +177,8 @@ func (app *application) loginHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// @Summary     Register  
-// @Tags        Register  
+// @Summary     Registro Para nuevos usuarios
+// @Tags        Autenticacion
 // @Accept      json
 // @Produce     json
 // @Param       payload body  RegisterRequest true "Register credentials"
@@ -184,7 +203,6 @@ func (app *application) registerHandler(w http.ResponseWriter, r *http.Request) 
 		Rol:             req.Rol,
 	}
 
-
 	err = user.Contrasena.Set(req.Contrasena)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
@@ -193,8 +211,6 @@ func (app *application) registerHandler(w http.ResponseWriter, r *http.Request) 
 
 	v := validator.New()
 	data.ValidateUser(v, user)
-
-	
 
 	if !v.Valid() {
 		app.failedValidationResponse(w, r, v.Errors)
@@ -215,15 +231,15 @@ func (app *application) registerHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	var permissionsToAdd []string
-	if user.Rol == "admnin" {
+	if user.Rol == "administrador" {
 		permissionsToAdd = AdminPermissions
 	} else {
 		permissionsToAdd = UserPermissions
 	}
 
-	err = app.models.Permissions.AddForUser(user.ID, permissionsToAdd...);
+	err = app.models.Permissions.AddForUser(user.ID, permissionsToAdd...)
 
-	if  err != nil {
+	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
 	}
@@ -233,3 +249,5 @@ func (app *application) registerHandler(w http.ResponseWriter, r *http.Request) 
 		app.serverErrorResponse(w, r, err)
 	}
 }
+
+

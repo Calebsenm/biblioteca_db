@@ -7,7 +7,14 @@ run: build
 
 clean: 
 	rm -f app
+
+migrate-up:
+	go run cmd/migrate/migration.go -direction=up
+
+migrate-down:
+	go run cmd/migrate/migration.go -direction=down
 	
 .PHONY: docs
 docs:
-	swag init --dir ./cmd/api 
+	swag init --dir "./cmd/api,./internal/data" 
+

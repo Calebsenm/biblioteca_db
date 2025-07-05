@@ -1,5 +1,5 @@
-import React from "react";
 import { Route, Routes } from "react-router-dom";
+import Dashboard from "../components/Admin/Dashboard";
 import Books from "../components/Admin/Books";
 import Users from "../components/Admin/Users";
 import AdminLayout from "../components/Layout/AdminLayout";
@@ -18,6 +18,7 @@ const AdminRoutes = () => {
     <ProtectedRoute allowedRoles={["administrador"]}>
       <AdminLayout>
         <Routes>
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/books" element={<Books/>} />
           <Route path="/users" element={<Users/>} />
           <Route path="/loans" element={<Loans/>} />

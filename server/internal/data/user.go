@@ -15,7 +15,6 @@ type User_ struct {
 	FechaNacimiento string `json:"fechanacimiento"`
 	TipoSocio       string `json:"tiposocio"`
 	FechaRegistro   string `json:"fecharegistro"`
-	ImagenPerfil    string `json:"imagenperfil"`
 	Rol             string `json:"rol"`
 }
 
@@ -30,7 +29,7 @@ func (m UserModel_)GetUserByType(userType string) ([]*User_, error) {
 	
 	query := `
 		SELECT 
-			idsocio, nombre, direccion, telefono, correo, fechanacimiento, tiposocio, fecharegistro, imagenperfil, rol 
+			idsocio, nombre, direccion, telefono, correo, fechanacimiento, tiposocio, fecharegistro, rol 
 		FROM socio 
 		WHERE tiposocio = ?`
 
@@ -46,7 +45,43 @@ func (m UserModel_)GetUserByType(userType string) ([]*User_, error) {
 
 	for rows.Next() {
 		var user User_
-		err := rows.Scan(&user.ID, &user.Nombre, &user.Direccion, &user.Telefono, &user.Correo, &user.FechaNacimiento, &user.TipoSocio, &user.FechaRegistro, &user.ImagenPerfil, &user.Rol)
+		err := rows.Scan(&user.ID, &user.Nombre, &user.Direccion, &user.Telefono, &user.Correo, &user.FechaNacimiento, &user.TipoSocio, &user.FechaRegistro, &user.Rol)
+		if err != nil {
+			return nil , err 
+		}
+		users = append(users, &user)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil , err 
+	}
+
+	return users , nil 
+}
+
+func (m UserModel_)GetAllUsers() ([]*User_, error) {
+	
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	
+	query := `
+		SELECT 
+			idsocio, nombre, direccion, telefono, correo, fechanacimiento, tiposocio, fecharegistro, rol 
+		FROM socio`
+
+	rows, err := m.DB.QueryContext(ctx, query)
+
+	if err != nil {
+		return nil , err 
+	}
+
+	defer rows.Close()
+
+	var users []*User_
+
+	for rows.Next() {
+		var user User_
+		err := rows.Scan(&user.ID, &user.Nombre, &user.Direccion, &user.Telefono, &user.Correo, &user.FechaNacimiento, &user.TipoSocio, &user.FechaRegistro, &user.Rol)
 		if err != nil {
 			return nil , err 
 		}

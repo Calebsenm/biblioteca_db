@@ -48,6 +48,17 @@ type LoanCompleted struct {
 	TituloLibro     string `json:"titulo_libro"`
 }
 
+type LoanAdmin struct {
+	IDPrestamo      int    `json:"idprestamo"`
+	IDSocio         int    `json:"idsocio"`
+	NombreSocio     string `json:"nombre_socio"`
+	IDLibro         int    `json:"idlibro"`
+	TituloLibro     string `json:"titulo_libro"`
+	FechaPrestamo   string `json:"fechaprestamo"`
+	FechaDevolucion string `json:"fechadevolucion"`
+	Estado          string `json:"estado"`
+}
+
 type LoanModel struct {
 	DB *sql.DB
 }
@@ -258,3 +269,95 @@ func (m LoanModel) GetUserCompletedLoanHistory(usuarioID string) ([]*LoanComplet
 
 	return loans, nil
 }
+
+// GetLoanByID obtiene un préstamo específico por su ID
+func (m LoanModel) GetLoanByID(loanID string) (*Loans, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `
+		SELECT idprestamo, idsocio, idlibro, fechaprestamo, fechadevolucion, estado
+		FROM prestamo
+		WHERE idprestamo = ?
+	`
+
+	var loan Loans
+	err := m.DB.QueryRowContext(ctx, query, loanID).Scan(
+		&loan.IDPrestamo,
+		&loan.IDSocio,
+		&loan.IDLibro,
+		&loan.FechaPrestamo,
+		&loan.FechaDevolucion,
+		&loan.Estado,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &loan, nil
+}
+
+// CompleteLoan marca un préstamo como completado
+func (m LoanModel) CompleteLoan(loanID string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := "UPDATE prestamo SET estado = 'completado' WHERE idprestamo = ?"
+	_, err := m.DB.ExecContext(ctx, query, loanID)
+	return err
+}
+
+// GetActiveLoansByDateRange obtiene todos los préstamos activos en un rango de fechas con información completa
+func (m LoanModel) GetActiveLoansByDateRange(startdate, enddate string) ([]*LoanAdmin, error) {
+	query := `
+		SELECT 
+			prestamo.idprestamo,
+			prestamo.idsocio,
+			socio.nombre AS nombre_socio,
+			prestamo.idlibro,
+			libro.titulo AS titulo_libro,
+			prestamo.fechaprestamo,
+			prestamo.fechadevolucion,
+			prestamo.estado
+		FROM prestamo
+		JOIN socio ON prestamo.idsocio = socio.idsocio
+		JOIN libro ON prestamo.idlibro = libro.idlibro
+		WHERE prestamo.estado = 'activo' AND prestamo.fechaprestamo BETWEEN ? AND ?
+		ORDER BY prestamo.fechaprestamo DESC
+	`
+	
+	rows, err := m.DB.Query(query, startdate, enddate)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var loans []*LoanAdmin
+
+	for rows.Next() {
+		var loan LoanAdmin
+		err := rows.Scan(
+			&loan.IDPrestamo,
+			&loan.IDSocio,
+			&loan.NombreSocio,
+			&loan.IDLibro,
+			&loan.TituloLibro,
+			&loan.FechaPrestamo,
+			&loan.FechaDevolucion,
+			&loan.Estado,
+		)
+		if err != nil {
+			return nil, err
+		}
+		loans = append(loans, &loan)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return loans, nil
+}
+
+

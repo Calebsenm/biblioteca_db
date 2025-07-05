@@ -66,10 +66,15 @@ type application struct {
 }
 
 
-// @title           BibliotecaAPI 
-// @version         1.0
-// @description     Rest-Api for library 
-// @BasePath        /v1/
+// @title BibliotecaAPI
+// @version 1.0
+// @description Rest-Api for library
+// @BasePath /v1
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer " followed by your JWT token.
 func main() {
 	var cfg config
 
