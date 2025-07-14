@@ -8,27 +8,27 @@ Backend desarrollado en Go para el sistema de gestión de biblioteca, con arquit
 ```
 server/
 ├── cmd/
-│   ├── api/                    # Punto de entrada principal
-│   │   ├── main.go            # Servidor HTTP
-│   │   ├── routes.go          # Definición de rutas
-│   │   ├── middleware.go      # Middlewares personalizados
-│   │   ├── authhandler.go     # Autenticación y registro
-│   │   ├── bookhandler.go     # Gestión de libros
-│   │   ├── loanhandler.go     # Gestión de préstamos
-│   │   ├── finehandler.go     # Gestión de multas
-│   │   ├── reservationhandler.go # Gestión de reservas
-│   │   ├── userhandler.go     # Gestión de usuarios
-│   │   ├── editorialhandler.go # Gestión de editoriales
-│   │   ├── autorhandler.go    # Gestión de autores
-│   │   └── healcheck.go       # Health check
-│   └── migrate/               # Herramientas de migración
-│       ├── migration.go       # Ejecutor de migraciones
-│       └── migrations/        # Archivos SQL de migración
+│   ├── api/                        # Punto de entrada principal
+│   │   ├── main.go                 # Servidor HTTP
+│   │   ├── routes.go               # Definición de rutas
+│   │   ├── middleware.go           # Middlewares personalizados
+│   │   ├── authhandler.go          # Autenticación y registro
+│   │   ├── bookhandler.go          # Gestión de libros
+│   │   ├── loanhandler.go          # Gestión de préstamos
+│   │   ├── finehandler.go          # Gestión de multas
+│   │   ├── reservationhandler.go   # Gestión de reservas
+│   │   ├── userhandler.go          # Gestión de usuarios
+│   │   ├── editorialhandler.go     # Gestión de editoriales
+│   │   ├── autorhandler.go         # Gestión de autores
+│   │   └── healcheck.go            # Health check
+│   └── migrate/                    # Herramientas de migración
+│       ├── migration.go            # Ejecutor de migraciones
+│       └── migrations/             # Archivos SQL de migración
 ├── internal/
-│   ├── auth/                  # Lógica de autenticación
+│   ├── auth/                 # Lógica de autenticación
 │   │   ├── auth.go           # Autenticación principal
 │   │   └── jwt.go            # Manejo de JWT
-│   ├── data/                  # Capa de acceso a datos
+│   ├── data/                 # Capa de acceso a datos
 │   │   ├── models.go         # Estructuras de datos
 │   │   ├── user.go           # Operaciones de usuario
 │   │   ├── book.go           # Operaciones de libros
@@ -126,12 +126,12 @@ go build -o app ./cmd/api
 
 ### Comandos Makefile
 ```bash
-make build      # Compilar aplicación
-make run        # Ejecutar aplicación
-make clean      # Limpiar archivos compilados
-make migrate-up # Ejecutar migraciones
-make migrate-down # Revertir migraciones
-make docs       # Generar documentación Swagger
+make build          # Compilar aplicación
+make run            # Ejecutar aplicación
+make clean          # Limpiar archivos compilados
+make migrate-up     # Ejecutar migraciones
+make migrate-down   # Revertir migraciones
+make docs           # Generar documentación Swagger
 ```
 
 ## 🔐 Sistema de Autenticación
@@ -359,19 +359,6 @@ func (app *application) handlerName(w http.ResponseWriter, r *http.Request) {
 - Validaciones en `internal/validator/`
 - Autenticación en `internal/auth/`
 
-## 🚀 Despliegue
-
-### Docker
-```dockerfile
-FROM golang:1.21-alpine
-WORKDIR /app
-COPY go.mod go.sum ./
-RUN go mod download
-COPY . .
-RUN go build -o main ./cmd/api
-EXPOSE 4000
-CMD ["./main", "-env=production", "-dns=user:pass@(host:port)/db?parseTime=true", "-jwt=production_secret"]
-```
 
 ### Parámetros de Producción
 ```bash

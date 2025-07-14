@@ -1,18 +1,18 @@
 # 🎨 Frontend - Sistema de Biblioteca
 
-Frontend desarrollado en React para el sistema de gestión de biblioteca, con interfaz moderna y responsiva.
+Frontend desarrollado en React para el sistema de gestión de biblioteca.
 
 ## 🏗️ Arquitectura
 
 ### Estructura del Proyecto
 ```
 client/
-├── public/                   # Archivos públicos
-│   ├── index.html           # HTML principal
-│   └── vite.svg             # Iconos
+├── public/                    # Archivos públicos
+│   ├── index.html             # HTML principal
+│   └── vite.svg               # Iconos
 ├── src/
-│   ├── components/          # Componentes React
-│   │   ├── Admin/          # Componentes de administrador
+│   ├── components/            # Componentes React
+│   │   ├── Admin/             # Componentes de administrador
 │   │   │   ├── Dashboard.jsx
 │   │   │   ├── Books.jsx
 │   │   │   ├── Users.jsx
@@ -22,18 +22,18 @@ client/
 │   │   │   ├── CreateBook.jsx
 │   │   │   ├── CreateEditorial.jsx
 │   │   │   └── Author.jsx
-│   │   ├── User/           # Componentes de usuario
+│   │   ├── User/                # Componentes de usuario
 │   │   │   ├── Dashboard.jsx
 │   │   │   ├── Libro.jsx
 │   │   │   ├── Prestamos.jsx
 │   │   │   ├── Reservas.jsx
 │   │   │   ├── Multas.jsx
 │   │   │   └── Historial.jsx
-│   │   ├── Layout/         # Componentes de layout
+│   │   ├── Layout/              # Componentes de layout
 │   │   │   ├── AdminLayout.jsx
 │   │   │   ├── UserLayout.jsx
 │   │   │   └── Sidebar.jsx
-│   │   ├── common/         # Componentes comunes
+│   │   ├── common/              # Componentes comunes
 │   │   │   ├── DataTable.jsx
 │   │   │   ├── FilterForm.jsx
 │   │   │   ├── Modal.jsx
@@ -41,17 +41,17 @@ client/
 │   │   │   ├── Notification.jsx
 │   │   │   └── Breadcrumbs.jsx
 │   │   └── Navbar.jsx
-│   ├── pages/              # Páginas principales
+│   ├── pages/                   # Páginas principales
 │   │   ├── Login.jsx
 │   │   ├── Register.jsx
 │   │   ├── NotFound.jsx
 │   │   └── DashboardRedirect.jsx
-│   ├── routes/             # Configuración de rutas
+│   ├── routes/                  # Configuración de rutas
 │   │   ├── AdminRoutes.jsx
 │   │   ├── UserRoutes.jsx
 │   │   └── ProtectedRoute.jsx
-│   ├── services/           # Servicios API
-│   │   ├── api.js          # Cliente HTTP base
+│   ├── services/                # Servicios API
+│   │   ├── api.js               # Cliente HTTP base
 │   │   ├── authService.js
 │   │   ├── bookService.js
 │   │   ├── loanService.js
@@ -60,21 +60,21 @@ client/
 │   │   ├── userService.js
 │   │   ├── authorService.js
 │   │   └── editorialService.js
-│   ├── hooks/              # Hooks personalizados
-│   │   ├── useApi.js       # Hook para llamadas API
+│   ├── hooks/                   # Hooks personalizados
+│   │   ├── useApi.js            # Hook para llamadas API
 │   │   └── useNotification.js
-│   ├── styles/             # Estilos CSS
-│   │   ├── common/         # Estilos comunes
-│   │   ├── admin/          # Estilos de admin
-│   │   └── user/           # Estilos de usuario
-│   ├── assets/             # Recursos estáticos
-│   ├── config.js           # Configuración
-│   ├── auth.js             # Utilidades de autenticación
-│   ├── App.jsx             # Componente principal
-│   └── main.jsx            # Punto de entrada
-├── package.json            # Dependencias y scripts
-├── vite.config.js          # Configuración de Vite
-└── index.html              # HTML principal
+│   ├── styles/                  # Estilos CSS
+│   │   ├── common/              # Estilos comunes
+│   │   ├── admin/               # Estilos de admin
+│   │   └── user/                # Estilos de usuario
+│   ├── assets/                  # Recursos estáticos
+│   ├── config.js                # Configuración
+│   ├── auth.js                  # Utilidades de autenticación
+│   ├── App.jsx                  # Componente principal
+│   └── main.jsx                 # Punto de entrada
+├── package.json                 # Dependencias y scripts
+├── vite.config.js               # Configuración de Vite
+└── index.html                  # HTML principal
 ```
 
 ## 🚀 Tecnologías
@@ -485,21 +485,4 @@ npm run build
 VITE_URL_BACKEND=https://api.tubiblioteca.com/v1/api
 ```
 
-### Servidor Web
-- **Nginx** - Servidor web
-- **Apache** - Alternativa
-- **CDN** - Para assets estáticos
-
-## 📚 Recursos
-
-### Documentación
-- [React Documentation](https://react.dev/)
-- [Vite Documentation](https://vitejs.dev/)
-- [React Router Documentation](https://reactrouter.com/)
-
-### Herramientas
-- [React Developer Tools](https://chrome.google.com/webstore/detail/react-developer-tools)
-- [Vite Plugin](https://marketplace.visualstudio.com/items?itemName=Vite.vite)
-- [ESLint](https://eslint.org/) - Linting
-- [Prettier](https://prettier.io/) - Formateo de código
 

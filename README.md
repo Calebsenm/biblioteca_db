@@ -1,14 +1,14 @@
 # 📚 Sistema de Gestión de Biblioteca
 
-Sistema completo de gestión de biblioteca con frontend en React y backend en Go, incluyendo gestión de libros, usuarios, préstamos, multas y reservas.
+Sistema completo de gestión de biblioteca con frontend en React y backend en Go, 
+incluyendo gestión de libros, usuarios, préstamos, multas y reservas.
 
 ## 🚀 Tecnologías Utilizadas
 
 ### Backend
-- **Go** - Lenguaje principal
-- **MySQL** - Base de datos
-- **Gin** - Framework web
-- **JWT** - Autenticación
+- **Go**        Programing languaje
+- **MySQL**     Base de datos
+- **JWT**       Autenticación
 - **Golang-migrate** - Migraciones de base de datos
 
 ### Frontend
@@ -23,6 +23,7 @@ Sistema completo de gestión de biblioteca con frontend en React y backend en Go
 - **Node.js** 18 o superior
 - **MySQL** 8.0 o superior
 - **Git**
+
 
 ## 🛠️ Instalación y Configuración
 
@@ -70,10 +71,9 @@ go run cmd/api/main.go
 # O con parámetros personalizados
 go run cmd/api/main.go -dns="root:tu_password@(127.0.0.1:3306)/biblioteca?parseTime=true" -jwt="tu_secret" -port=4000
 
-# O usando Makefile
+# O usando Makefile 
 make run
 ```
-
 El backend estará disponible en: `http://localhost:4000`
 
 ### 4. Configurar Frontend
@@ -255,6 +255,3 @@ VITE_URL_BACKEND=http://localhost:4000/v1/api
 4. Push a la rama (`git push origin feature/AmazingFeature`)
 5. Abrir un Pull Request
 
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
